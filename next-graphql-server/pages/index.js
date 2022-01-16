@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import {addFakeUser, addUser, getFakesers, getUser, getUsers, modifyUser} from "./requests";
+import {addFakeUser, addUser, deleteFakeUser, getFakesers, getUser, getUsers, modifyUser} from "./requests";
 
 const renderUser = (user) => {
   return (
@@ -21,6 +21,7 @@ export default function Home() {
   const [input, setInput] = useState('');
   const [fakeIdInput, setFakeIdInput] = useState('');
   const [fakeTitleInput, setFakeTitleInput] = useState('');
+  const [deletefakeIdInput, setDeletefakeIdInput] = useState('');
 
   useEffect(async () => {
     getFakeUsers();
@@ -37,6 +38,12 @@ export default function Home() {
     });
   }
 
+  const handleDeleteFakeButtonClick = () => {
+    deleteFakeUser(deletefakeIdInput).then(resp => {
+      if (resp.status === 200 && resp.data?.data?.deleteFakeUser) getFakeUsers();
+    });
+  }
+
   const handleFakeButtonClick = () => {
     addFakeUser(fakeIdInput, fakeTitleInput).then(resp => {
       if (resp.status === 200 && resp.data?.data?.addFakeUser) getFakeUsers();
@@ -49,6 +56,10 @@ export default function Home() {
 
   const setFakeTitleInputValue = (e) => {
     setFakeTitleInput(e.target.value);
+  }
+
+  const setDeleteFakeIdInputValue = (e) => {
+    setDeletefakeIdInput(e.target.value);
   }
 
   const handleButtonClick = () => {
@@ -86,6 +97,10 @@ export default function Home() {
         <input type='text' placeholder='Id' onChange={setFakeIdInputValue}/>
         <input type='text' placeholder='Title' onChange={setFakeTitleInputValue}/>
         <button onClick={handleFakeButtonClick}>Add</button>
+
+        Delete a fake user:
+        <input type='text' placeholder='Id' onChange={setDeleteFakeIdInputValue}/>
+        <button onClick={handleDeleteFakeButtonClick}>Delete</button>
 
         First 3 users:
         <p>{users.length ? users.filter((u, i) => i <= 3).map(user => renderUser(user)) : ''}</p>

@@ -12,6 +12,10 @@ const getFakeusersData = (id) => {
     return { "query": `{  getFakeUsers { id, title, completed } }` };
 }
 
+const deleteFakeuserData = (id) => {
+    return { "query": `mutation { deleteFakeUser(id: \"${id}\") { id, title, completed } }`};
+}
+
 const addFakeUserData = (id, title) => {
     return { "query": `mutation { addFakeUser(id: \"${id}\", title: \"${title}\") { id, title, completed } }`};
 }
@@ -30,4 +34,8 @@ export const addFakeUser = (id, title) => {
 
 export const getFakesers = () => {
     return axios.post('http://localhost:3000/api/graphql', getFakeusersData());
+}
+
+export const deleteFakeUser = (id) => {
+    return axios.post('http://localhost:3000/api/graphql', deleteFakeuserData(id));
 }
