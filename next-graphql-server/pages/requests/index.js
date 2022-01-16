@@ -13,7 +13,7 @@ const getFakeusersData = (id) => {
 }
 
 const addFakeUserData = (id, title) => {
-    return { "mutation": `{  addFakeUser(id: \"${id}\", title: \"${title}\") { id, title, completed } }` };
+    return { "query": `mutation { addFakeUser(id: \"${id}\", title: \"${title}\") { id, title, completed } }`};
 }
 
 export const getUsers = () => {

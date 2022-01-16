@@ -19,17 +19,37 @@ export default function Home() {
   const [fakeusers, setFakeusers] = useState([]);
   const [user, setUser] = useState(null);
   const [input, setInput] = useState('');
+  const [fakeIdInput, setFakeIdInput] = useState('');
+  const [fakeTitleInput, setFakeTitleInput] = useState('');
 
   useEffect(async () => {
-    //const s = await addFakeUser(1, "abc");
-    //console.log(s)
-    getFakesers().then(resp => {
-      if (resp.status === 200) setFakeusers(resp.data.data.getFakeUsers);
-    })
+    getFakeUsers();
     getUsers().then(resp => {
-      if (resp.status === 200) setUsers(resp.data.data.getUsers);
+      if (resp.status === 200 && resp.data?.data?.getUsers) setUsers(resp.data.data.getUsers);
+      else setUsers([]);
     })
   }, []);
+
+  const getFakeUsers = () => {
+    getFakesers().then(resp => {
+      if (resp.status === 200 && resp.data?.data?.getFakeUsers) setFakeusers(resp.data.data.getFakeUsers);
+      else setFakeusers([]);
+    });
+  }
+
+  const handleFakeButtonClick = () => {
+    addFakeUser(fakeIdInput, fakeTitleInput).then(resp => {
+      if (resp.status === 200 && resp.data?.data?.addFakeUser) getFakeUsers();
+    });
+  }
+
+  const setFakeIdInputValue = (e) => {
+    setFakeIdInput(e.target.value);
+  }
+
+  const setFakeTitleInputValue = (e) => {
+    setFakeTitleInput(e.target.value);
+  }
 
   const handleButtonClick = () => {
     getUser(input).then(resp => {
@@ -61,6 +81,11 @@ export default function Home() {
         </p>
         Fake users:
         <p>{fakeusers.length ? fakeusers.map(user => renderUser(user)) : ''}</p>
+
+        Add a fake user:
+        <input type='text' placeholder='Id' onChange={setFakeIdInputValue}/>
+        <input type='text' placeholder='Title' onChange={setFakeTitleInputValue}/>
+        <button onClick={handleFakeButtonClick}>Add</button>
 
         First 3 users:
         <p>{users.length ? users.filter((u, i) => i <= 3).map(user => renderUser(user)) : ''}</p>
