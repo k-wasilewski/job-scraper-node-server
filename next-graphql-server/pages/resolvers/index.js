@@ -58,7 +58,6 @@ export const resolvers = {
         },
         deleteFakeUser: async (_, {id}, {dataSources}) => {
             var removeIndex = fakeDatabase.users.map(u => u.id).indexOf(id);
-            console.log(removeIndex)
             const user = Object.assign({}, fakeDatabase.users.find((user, i) => {
                 return user.id === id;
             }));
