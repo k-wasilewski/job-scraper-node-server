@@ -5,7 +5,7 @@ const fakeDatabase = {
         {
             id: "-1",
             title: "FAKE USERR",
-            complete: false
+            completed: false
         }
     ]
 }

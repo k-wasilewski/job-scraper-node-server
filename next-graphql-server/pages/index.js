@@ -2,14 +2,14 @@ import React, {useEffect, useState} from "react";
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import {addFakeUser, addUser, deleteFakeUser, getFakesers, getUser, getUsers, modifyUser} from "./requests";
+import {addFakeUser, deleteFakeUser, getFakesers, getUser, getUsers} from "./requests";
 
 const renderUser = (user) => {
   return (
       <>
         <p>id: {user.id}</p>
         <p>title: {user.title}</p>
-        <p>completed: {user.completed}</p>
+        <p>completed: {user.completed.toString()}</p>
       </>
   );
 }
