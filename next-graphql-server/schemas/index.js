@@ -1,10 +1,15 @@
-import  {  gql  }  from  "apollo-server-micro";
+import { gql } from "apollo-server-micro";
+import { NEWS } from "../resolvers";
 
 export const typeDefs  =  gql`
     type  User {
         id: String
         title: String
         completed: Boolean
+    }
+    
+    type NewsItem {
+        content: String
     }
 
     type  Query {
@@ -16,4 +21,8 @@ export const typeDefs  =  gql`
     type Mutation {
         addFakeUser(id: String!, title: String!): User!
         deleteFakeUser(id: String!): User!
+    }
+    
+    type Subscription {
+        ${NEWS}: [NewsItem]
     }`

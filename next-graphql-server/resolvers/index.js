@@ -1,4 +1,14 @@
 import axios from "axios";
+import { PubSub } from "graphql-subscriptions";
+
+export const NEWS = 'news';
+
+const pubsub = new PubSub();
+
+setInterval(() => {
+    let i = 0;
+    pubsub.publish(NEWS, { content: `info-${i++}`});
+}, 5000);
 
 const fakeDatabase = {
     users: [
@@ -64,5 +74,10 @@ export const resolvers = {
             if (removeIndex !== -1) fakeDatabase.users.splice(removeIndex, 1);
             return user;
         },
+    },
+    Subscription: {
+        [NEWS]: {
+            subscribe: () => pubsub.asyncIterator(NEWS)
+        }
     }
 };

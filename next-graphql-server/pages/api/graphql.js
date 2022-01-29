@@ -1,4 +1,4 @@
-import  { ApolloServer }  from  "apollo-server-micro";
+import  { ApolloServer }  from  "apollo-server-micro"; //TODO: apollo-server-micro doesn't support subscriptions :/
 import  { typeDefs } from "../../schemas";
 import  { resolvers }  from "../../resolvers";
 

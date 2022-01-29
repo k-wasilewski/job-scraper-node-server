@@ -1,7 +1,14 @@
 import axios from "axios";
 
+const APOLLO_SERVER_ENDPOINT = "http://localhost:3000/api/graphql";
+const APOLLO_SUBSCRIPTION_SERVER_ENDPOINT = "http://localhost:8080/graphql";
+
+const getHelloToSubscriptionData = () => {
+    return { "query": "{ hello { content } }"};
+};
+
 const getUsersData = () => {
-    return { "query": "{  getUsers { id, title, completed } }" }
+    return { "query": "{  getUsers { id, title, completed } }" };
 };
 
 const getUserData = (id) => {
@@ -21,21 +28,25 @@ const addFakeUserData = (id, title) => {
 }
 
 export const getUsers = () => {
-    return axios.post('http://localhost:3000/api/graphql', getUsersData());
+    return axios.post(APOLLO_SERVER_ENDPOINT, getUsersData());
 }
 
 export const getUser = (id) => {
-    return axios.post('http://localhost:3000/api/graphql', getUserData(id));
+    return axios.post(APOLLO_SERVER_ENDPOINT, getUserData(id));
 }
 
 export const addFakeUser = (id, title) => {
-    return axios.post('http://localhost:3000/api/graphql', addFakeUserData(id, title));
+    return axios.post(APOLLO_SERVER_ENDPOINT, addFakeUserData(id, title));
 }
 
 export const getFakesers = () => {
-    return axios.post('http://localhost:3000/api/graphql', getFakeusersData());
+    return axios.post(APOLLO_SERVER_ENDPOINT, getFakeusersData());
 }
 
 export const deleteFakeUser = (id) => {
-    return axios.post('http://localhost:3000/api/graphql', deleteFakeuserData(id));
+    return axios.post(APOLLO_SERVER_ENDPOINT, deleteFakeuserData(id));
+}
+
+export const helloToSubscription = () => {
+    return axios.post(APOLLO_SUBSCRIPTION_SERVER_ENDPOINT, getHelloToSubscriptionData());
 }
