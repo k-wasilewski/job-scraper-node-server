@@ -1,16 +1,12 @@
 {
-  "name": "subscriptions-server",
+  "name": "apollo-server",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "zen start -e android -d ios",
-    "android": "zen start -e android -d ios -d web",
-    "ios": "zen start -e ios -d android -d web",
+    "start": "zen start",
     "build": "zen build"
   },
-  "workspaces": [
-    "packages/*"
-  ],
-  "devDependencies": {
+  "dependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
@@ -67,9 +63,17 @@
     "webpack": "4.29.5",
     "webpack-dev-server": "3.1.14",
     "webpack-manifest-plugin": "2.0.4",
-    "webpack-virtual-modules": "0.1.10"
-  },
-  "resolutions": {
-    "@types/react": "16.8.2"
+    "webpack-virtual-modules": "0.1.10",
+    "apollo-server-express": "2.4.2",
+    "apollo-server-module-graphiql": "1.3.4",
+    "axios": "^0.25.0",
+    "cors": "^2.8.4",
+    "express": "^4.16.4",
+    "graphql": "14.0.2",
+    "graphql-subscriptions": "^2.0.0",
+    "graphql-tools": "4.0.4",
+    "opn": "^5.3.0",
+    "subscriptions-transport-ws": "^0.9.15",
+    "zen": "^0.1.7"
   }
 }

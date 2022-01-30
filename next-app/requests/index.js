@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const APOLLO_SERVER_ENDPOINT = "http://localhost:3000/api/graphql";
-const APOLLO_SUBSCRIPTION_SERVER_ENDPOINT = "http://localhost:8080/graphql";
+const APOLLO_SERVER_ENDPOINT = "http://localhost:8080/graphql";
 
 const getHelloToSubscriptionData = () => {
     return { "query": "{ hello { content } }"};
@@ -48,5 +47,5 @@ export const deleteFakeUser = (id) => {
 }
 
 export const helloToSubscription = () => {
-    return axios.post(APOLLO_SUBSCRIPTION_SERVER_ENDPOINT, getHelloToSubscriptionData());
+    return axios.post(APOLLO_SERVER_ENDPOINT, getHelloToSubscriptionData());
 }

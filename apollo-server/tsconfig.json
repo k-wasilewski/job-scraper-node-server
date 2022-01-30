@@ -20,5 +20,13 @@
     "pretty": true,
     "removeComments": true,
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "typings/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
 }

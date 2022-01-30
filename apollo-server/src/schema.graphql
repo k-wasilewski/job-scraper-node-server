@@ -1,0 +1,25 @@
+type User {
+    id: String
+    title: String
+    completed: Boolean
+}
+
+type NewsItem {
+    content: String
+}
+
+type Query {
+    getUsers: [User]
+    getUser(id: String!): User!
+    getFakeUsers: [User]
+    hello: NewsItem
+}
+
+type Mutation {
+    addFakeUser(id: String!, title: String!): User!
+    deleteFakeUser(id: String!): User!
+}
+
+type Subscription {
+    news: NewsItem
+}
