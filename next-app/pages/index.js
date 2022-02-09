@@ -1,7 +1,15 @@
 import React, {useEffect, useState} from "react";
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import {addFakeUser, deleteFakeUser, getFakesers, getUser, getUsers, helloToSubscription} from "../requests";
+import {
+  addFakeUser,
+  deleteFakeUser,
+  getFakesers,
+  getUser,
+  getUsers,
+  helloToSpring,
+  helloToSubscription
+} from "../requests";
 import { ApolloProvider } from "@apollo/client";
 import client from "../apollo_client";
 import News from "../components/news";
@@ -25,8 +33,10 @@ export default function Home() {
   const [fakeTitleInput, setFakeTitleInput] = useState('');
   const [deletefakeIdInput, setDeletefakeIdInput] = useState('');
   const [helloFromSubscription, setHelloFromSubscription] = useState('');
+  const [helloFromSpring, setHelloFromSpring] = useState('');
 
   useEffect(async () => {
+    getHelloFromSpring();
     getHelloFromSubscription();
     getFakeUsers();
     getUsers().then(resp => {
@@ -34,6 +44,12 @@ export default function Home() {
       else setUsers([]);
     })
   }, []);
+
+  const getHelloFromSpring = () => {
+    helloToSpring().then(resp => {
+      if (resp.status === 200) setHelloFromSpring(resp.data.data.hello.content);
+    })
+  }
 
   const getHelloFromSubscription = () => {
     helloToSubscription().then(resp => {
@@ -93,6 +109,9 @@ export default function Home() {
           </Head>
 
           <main className={styles.main}>
+
+            Hello from Spring server:
+            <p>{helloFromSpring}</p>
 
             Hello from subscription server:
             <p>{helloFromSubscription}</p>

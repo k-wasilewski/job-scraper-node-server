@@ -1,6 +1,11 @@
 import axios from "axios";
 
 const APOLLO_SERVER_ENDPOINT = "http://localhost:8080/graphql";
+const SPRING_SERVER_ENDPOINT = "http://localhost:8081/graphql";
+
+const getHelloToSpringData = () => {
+    return { "query": "{ hello { content } }"};
+};
 
 const getHelloToSubscriptionData = () => {
     return { "query": "{ hello { content } }"};
@@ -48,4 +53,8 @@ export const deleteFakeUser = (id) => {
 
 export const helloToSubscription = () => {
     return axios.post(APOLLO_SERVER_ENDPOINT, getHelloToSubscriptionData());
+}
+
+export const helloToSpring = () => {
+    return axios.post(SPRING_SERVER_ENDPOINT, getHelloToSpringData());
 }
