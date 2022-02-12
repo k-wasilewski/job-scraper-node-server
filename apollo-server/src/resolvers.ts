@@ -22,11 +22,6 @@ setInterval(() => {
 
 export default {
   Query: {
-    hello: () => {
-      pubsub.publish('news', { news: { content: `info-hello`} });
-
-      return { content: 'siemanko' }
-    },
     getUsers: async () => {
       try {
         const users = await axios.get("https://jsonplaceholder.typicode.com/todos");

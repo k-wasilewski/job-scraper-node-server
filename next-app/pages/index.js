@@ -5,10 +5,9 @@ import {
   addFakeUser,
   deleteFakeUser,
   getFakesers,
+  getSpringProducts,
   getUser,
   getUsers,
-  helloToSpring,
-  helloToSubscription
 } from "../requests";
 import { ApolloProvider } from "@apollo/client";
 import client from "../apollo_client";
@@ -24,6 +23,15 @@ const renderUser = (user) => {
   );
 }
 
+const renderProduct = (product) => {
+  return (
+      <>
+        <p>id: {product.id}</p>
+        <p>content: {product.content}</p>
+      </>
+  );
+}
+
 export default function Home() {
   const [users, setUsers] = useState([]);
   const [fakeusers, setFakeusers] = useState([]);
@@ -32,12 +40,10 @@ export default function Home() {
   const [fakeIdInput, setFakeIdInput] = useState('');
   const [fakeTitleInput, setFakeTitleInput] = useState('');
   const [deletefakeIdInput, setDeletefakeIdInput] = useState('');
-  const [helloFromSubscription, setHelloFromSubscription] = useState('');
-  const [helloFromSpring, setHelloFromSpring] = useState('');
+  const [springProducts, setSpringProducts] = useState([]);
 
   useEffect(async () => {
-    getHelloFromSpring();
-    getHelloFromSubscription();
+    handleGetSpringProducts();
     getFakeUsers();
     getUsers().then(resp => {
       if (resp.status === 200 && resp.data?.data?.getUsers) setUsers(resp.data.data.getUsers);
@@ -45,15 +51,9 @@ export default function Home() {
     })
   }, []);
 
-  const getHelloFromSpring = () => {
-    helloToSpring().then(resp => {
-      if (resp.status === 200) setHelloFromSpring(resp.data.data.hello.content);
-    })
-  }
-
-  const getHelloFromSubscription = () => {
-    helloToSubscription().then(resp => {
-      if (resp.status === 200) setHelloFromSubscription(resp.data.data.hello.content);
+  const handleGetSpringProducts = () => {
+    getSpringProducts().then(resp => {
+      if (resp.status === 200) setSpringProducts(resp.data.data.getAllProducts);
     })
   }
 
@@ -110,11 +110,8 @@ export default function Home() {
 
           <main className={styles.main}>
 
-            Hello from Spring server:
-            <p>{helloFromSpring}</p>
-
-            Hello from subscription server:
-            <p>{helloFromSubscription}</p>
+            Spring products:
+            <p>{springProducts.map(renderProduct)}</p>
 
             Subscription news:
             <News />
