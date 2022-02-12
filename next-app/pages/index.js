@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {
-  addFakeUser,
-  deleteFakeUser,
+  addFakeUser, addSpringProduct,
+  deleteFakeUser, deleteSpringProduct, findSpringProductById,
   getFakesers,
   getSpringProducts,
   getUser,
@@ -41,6 +41,10 @@ export default function Home() {
   const [fakeTitleInput, setFakeTitleInput] = useState('');
   const [deletefakeIdInput, setDeletefakeIdInput] = useState('');
   const [springProducts, setSpringProducts] = useState([]);
+  const [springInputValue, setSpringInputValue] = useState('');
+  const [product, setProduct] = useState(null);
+  const [addProductContentValue, setAddProductContentValue] = useState('');
+  const [deleteProductIdValue, setDeleteProductIdValue] = useState('');
 
   useEffect(async () => {
     handleGetSpringProducts();
@@ -50,6 +54,40 @@ export default function Home() {
       else setUsers([]);
     })
   }, []);
+
+  const handleDeleteProductClick = () => {
+    deleteSpringProduct(deleteProductIdValue).then(resp => {
+      if (resp.status === 200 && resp.data?.data?.deleteProduct) {
+        handleGetSpringProducts();
+      }
+    })
+  }
+
+  const handleSpringIdInputChange = (evt) => {
+    setSpringInputValue(evt.target.value);
+  }
+
+  const handleAddProductInputChange = (evt) => {
+    setAddProductContentValue(evt.target.value);
+  }
+
+  const handleDeleteProductInputChange = (evt) => {
+    setDeleteProductIdValue(evt.target.value);
+  }
+
+  const handleAddProductClick = () => {
+    addSpringProduct(addProductContentValue).then(resp => {
+      if (resp.status === 200 && resp.data?.data?.addProduct) {
+        handleGetSpringProducts();
+      }
+    })
+  }
+
+  const handleSpringButtonClick = () => {
+    findSpringProductById(springInputValue).then(resp => {
+      if (resp.status === 200 && resp.data?.data?.getProduct) setProduct(resp.data.data.getProduct);
+    })
+  }
 
   const handleGetSpringProducts = () => {
     getSpringProducts().then(resp => {
@@ -112,6 +150,20 @@ export default function Home() {
 
             Spring products:
             <p>{springProducts.map(renderProduct)}</p>
+
+            Find product by id:
+            <input type='text' onChange={handleSpringIdInputChange}/>
+            <button onClick={handleSpringButtonClick}>Find</button>
+            Selected product:
+            <p>{product ? renderProduct(product) : ''}</p>
+
+            Add a product:
+            <input type='text' placeholder='Title' onChange={handleAddProductInputChange}/>
+            <button onClick={handleAddProductClick}>Add</button>
+
+            Delete a product:
+            <input type='text' placeholder='Id' onChange={handleDeleteProductInputChange}/>
+            <button onClick={handleDeleteProductClick}>Delete</button>
 
             Subscription news:
             <News />

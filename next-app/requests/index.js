@@ -3,9 +3,21 @@ import axios from "axios";
 const APOLLO_SERVER_ENDPOINT = "http://localhost:8080/graphql";
 const SPRING_SERVER_ENDPOINT = "http://localhost:8081/graphql";
 
+const deleteSpringProductData = (id) => {
+    return { "query": `mutation { deleteProduct(id: ${id}) { id, content } }`};
+};
+
+const addSpringProductData = (content) => {
+    return { "query": `mutation { addProduct(content: \"${content}\") { id, content } }`};
+};
+
+const getSpringProductData = (id) => {
+    return { "query": `{ getProduct(id: ${id}) { id, content } }`};
+};
+
 const getSpringProductsData = () => {
     return { "query": "{ getAllProducts { id, content } }"};
-};;
+};
 
 const getUsersData = () => {
     return { "query": "{  getUsers { id, title, completed } }" };
@@ -49,4 +61,16 @@ export const deleteFakeUser = (id) => {
 
 export const getSpringProducts = () => {
     return axios.post(SPRING_SERVER_ENDPOINT, getSpringProductsData());
+}
+
+export const findSpringProductById = (id) => {
+    return axios.post(SPRING_SERVER_ENDPOINT, getSpringProductData(id));
+}
+
+export const addSpringProduct = (content) => {
+    return axios.post(SPRING_SERVER_ENDPOINT, addSpringProductData(content));
+}
+
+export const deleteSpringProduct = (content) => {
+    return axios.post(SPRING_SERVER_ENDPOINT, deleteSpringProductData(content));
 }
