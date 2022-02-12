@@ -2,8 +2,11 @@ import React, {useEffect, useState} from "react";
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {
-  addFakeUser, addSpringProduct,
-  deleteFakeUser, deleteSpringProduct, findSpringProductById,
+  addFakeUser,
+  addSpringProduct,
+  deleteFakeUser,
+  deleteSpringProduct,
+  findSpringProductById,
   getFakesers,
   getSpringProducts,
   getUser,
@@ -11,7 +14,9 @@ import {
 } from "../requests";
 import { ApolloProvider } from "@apollo/client";
 import client from "../apollo_client";
+import client2 from "../apollo_client2";
 import News from "../components/news";
+import ProductChanges from "../components/productChanges";
 
 const renderUser = (user) => {
   return (
@@ -138,7 +143,6 @@ export default function Home() {
   }
 
   return (
-      <ApolloProvider client={client}>
         <div className={styles.container}>
           <Head>
             <title>{'next.js <- gql -> apollo server'}</title>
@@ -147,6 +151,11 @@ export default function Home() {
           </Head>
 
           <main className={styles.main}>
+
+            Spring product changes:
+            <ApolloProvider client={client2}>
+              <ProductChanges />
+            </ApolloProvider>
 
             Spring products:
             <p>{springProducts.map(renderProduct)}</p>
@@ -166,7 +175,9 @@ export default function Home() {
             <button onClick={handleDeleteProductClick}>Delete</button>
 
             Subscription news:
-            <News />
+            <ApolloProvider client={client}>
+              <News />
+            </ApolloProvider>
 
             Fake users:
             <p>{fakeusers.length ? fakeusers.map(user => renderUser(user)) : ''}</p>
@@ -190,6 +201,5 @@ export default function Home() {
             <p>{user ? renderUser(user) : ''}</p>
           </main>
         </div>
-      </ApolloProvider>
   )
 }

@@ -1,0 +1,18 @@
+type Product {
+    id: Int!
+    content: String!
+}
+
+type Query {
+    getAllProducts: [Product]
+    getProduct(id: Int!): Product
+}
+
+type Mutation {
+    addProduct(content: String!): Product
+    deleteProduct(id: Int!): Product
+}
+
+type Subscription {
+    productChanges: String!
+}
