@@ -160,7 +160,7 @@ export default function Home() {
         <main className={styles.main}>
 
           Scraper:
-          <Scraper site='http://www.onet.pl' word='czy' />
+          <Scraper />
 
           Spring product changes:
           <ApolloProvider client={client2}>
