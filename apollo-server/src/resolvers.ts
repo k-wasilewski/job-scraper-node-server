@@ -1,5 +1,6 @@
 import axios from "axios";
 import { PubSub } from "graphql-subscriptions";
+import {addDbUser, deleteDbUser} from "./mongodb";
 
 const pubsub = new PubSub();
 
@@ -68,6 +69,7 @@ export default {
         completed: true
       };
       fakeDatabase.users.push(user);
+      addDbUser(user);
       return user;
     },
     deleteFakeUser: async (_: any, args: { id: string }, __: any) => {
@@ -76,6 +78,7 @@ export default {
         return user.id === args.id;
       }));
       if (removeIndex !== -1) fakeDatabase.users.splice(removeIndex, 1);
+      deleteDbUser(user);
       return user;
     },
   },

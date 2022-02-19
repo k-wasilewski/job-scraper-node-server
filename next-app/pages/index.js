@@ -110,13 +110,19 @@ export default function Home() {
 
   const handleDeleteFakeButtonClick = () => {
     deleteFakeUser(deletefakeIdInput).then(resp => {
-      if (resp.status === 200 && resp.data?.data?.deleteFakeUser) getFakeUsers();
+      if (resp.status === 200 && resp.data?.data?.deleteFakeUser) {
+        console.log(resp.data?.data?.deleteFakeUser);
+        getFakeUsers();
+      }
     }).catch(e => console.log(e));
   }
 
   const handleFakeButtonClick = () => {
     addFakeUser(fakeIdInput, fakeTitleInput).then(resp => {
-      if (resp.status === 200 && resp.data?.data?.addFakeUser) getFakeUsers();
+      if (resp.status === 200 && resp.data?.data?.addFakeUser) {
+        console.log(resp.data?.data?.addFakeUser);
+        getFakeUsers();
+      }
     }).catch(e => console.log(e));
   }
 
