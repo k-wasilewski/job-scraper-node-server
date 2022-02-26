@@ -159,9 +159,6 @@ export default function Home() {
 
         <main className={styles.main}>
 
-          Scraper:
-          <Scraper />
-
           Spring product changes:
           <ApolloProvider client={client2}>
             <ProductChanges />
