@@ -21,7 +21,17 @@ export default function NodeServerHealthcheck() {
 
     if (data && !jobs.includes(data.newJobs)) setJobs(prevJobs => [...prevJobs, data.newJobs]);
 
-    return (loading ? <h4>Loading...</h4> : <h4>{jobs.map((n, i) => (
-        <>{n.link}<br/>{n.timestamp}<br/></>
-        ))}</h4>);
+    return loading ?
+        <h4>Loading...</h4>
+        :
+        <h4>
+            {jobs.map((newJob, i) => (
+                <div key={i}>
+                    {newJob.link}
+                    <br/>
+                    {newJob.timestamp}
+                    <br/>
+                </div>
+            ))}
+        </h4>;
 };

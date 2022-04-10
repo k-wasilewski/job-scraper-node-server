@@ -31,10 +31,10 @@ export default {
       jobLinkContains: string,
       numberOfPages: number,
       }, __: any) => {
-      const _host = args.host.split('&quot').join('"');
-      const _path = args.path.split('&quot').join('"');
-      const _jobAnchorSelector = args.jobAnchorSelector.split('&quot').join('"');
-      const _jobLinkContains = args.jobLinkContains.split('&quot').join('"');
+      const _host = args.host.replace(/&quot/g, '"');
+      const _path = args.path.replace(/&quot/g, '"');
+      const _jobAnchorSelector = args.jobAnchorSelector.replace(/&quot/g, '"');
+      const _jobLinkContains = args.jobLinkContains.replace(/&quot/g, '"');
       return await scrape(_host, _path, _jobAnchorSelector, _jobLinkContains, args.numberOfPages)
     },
     removeScreenshotByGroupAndUuid: async (_: any, args: {
