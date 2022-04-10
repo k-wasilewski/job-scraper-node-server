@@ -2,7 +2,6 @@ import puppeteer from 'puppeteer';
 import fs from 'fs';
 //import {getJobByLink, insertToJobs, Job} from "./mongodb";
 import {generateUUID, getPath, getWebpageName} from "./utils";
-import {Job} from "./mongodb";
 import {pubsub} from "./resolvers";
 
 export const scrape = async (
@@ -53,8 +52,6 @@ export const scrape = async (
                 insertToJobs(mongodbRecord);
             }*/
             const uuid = generateUUID();
-            const mongodbRecord: Job = { host, path, link: jobLink };
-            mongodbRecord.uuid = uuid;
             pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
             ////////////////////////////
 
