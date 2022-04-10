@@ -18,7 +18,15 @@ export default function SpringServerHealthcheck() {
 
     if (data && !timestamps.includes(data.scrapesPerformed)) setTimestamps(prevScrapes => [...prevScrapes, data.scrapesPerformed]);
 
-    return (loading ? <h4>Loading...</h4> : <h4>{timestamps.map((c, i) => (
-        <>{c}<br/></>
-    ))}</h4>);
+    return loading ?
+        <h4>Loading...</h4>
+        :
+        <h4>
+            {timestamps.map((timestamp, i) => (
+                <div key={i}>
+                    {timestamp}
+                    <br/>
+                </div>
+            ))}
+        </h4>;
 };
