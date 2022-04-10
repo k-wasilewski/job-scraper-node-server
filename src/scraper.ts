@@ -55,7 +55,7 @@ export const scrape = async (
                 pubsub.publish('newJobs', payload);
             }*/
             const uuid = generateUUID();
-            const payload = { newJobs: { timestamp: new Date().toString(), link: job.link } };
+            const payload = { newJobs: { timestamp: new Date().toString(), link: jobLink } };
             console.log(`Publishing message: ${JSON.stringify(payload)}`);
             pubsub.publish('newJobs', payload);
             ////////////////////////////

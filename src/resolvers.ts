@@ -1,6 +1,7 @@
 import { PubSub } from "graphql-subscriptions";
 import {scrape} from './scraper';
 import {getDirectories, getFilenames, removeFile} from "./utils";
+import {SCREENSHOTS_PATH} from "./server";
 //TODO: run scraper on Spring's request and notify dashboard how many new offers were found, keep results in db
 export const pubsub = new PubSub();
 
@@ -8,7 +9,7 @@ export default {
   Query: {
     getGroupNames: async () => {
       try {
-        return { names: getDirectories('C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots') };
+        return { names: getDirectories(SCREENSHOTS_PATH) };
       } catch (error) {
         throw error;
       }
@@ -17,7 +18,7 @@ export default {
       groupName: string,
     }, __: any) => {
       try {
-        return { files: getFilenames(`C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/${args.groupName}`) };
+        return { files: getFilenames(`${SCREENSHOTS_PATH}/${args.groupName}`) };
       } catch (error) {
         throw error;
       }
@@ -42,8 +43,8 @@ export default {
       uuid: string
     }, __: any) => {
       try {
-        removeFile(`C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/${args.groupName}/_${args.uuid}.png`)
-        return { deleted: removeFile(`C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/${args.groupName}/${args.uuid}.png`) };
+        removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/_${args.uuid}.png`)
+        return { deleted: removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/${args.uuid}.png`) };
       } catch (error) {
         throw error;
       }
