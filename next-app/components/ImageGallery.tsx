@@ -1,5 +1,5 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
-import arrowLeft from '../static/arrow_left.png';
+import React, {useLayoutEffect, useRef, useState} from "react";
+import arrowLeft from '../public/arrow_left.png';
 
 export const createWrapperAndAppendToBody = (wrapperId) => {
     const wrapperElement = document.createElement('div');
