@@ -50,9 +50,14 @@ export const scrape = async (
                 uuid = generateUUID();
                 mongodbRecord.uuid = uuid;
                 insertToJobs(mongodbRecord);
+                const payload = { newJobs: { timestamp: new Date().toString(), link: job.link } };
+                console.log(`Publishing message: ${JSON.stringify(payload)}`);
+                pubsub.publish('newJobs', payload);
             }*/
             const uuid = generateUUID();
-            pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
+            const payload = { newJobs: { timestamp: new Date().toString(), link: job.link } };
+            console.log(`Publishing message: ${JSON.stringify(payload)}`);
+            pubsub.publish('newJobs', payload);
             ////////////////////////////
 
             await jobPage.goto(jobLink);
