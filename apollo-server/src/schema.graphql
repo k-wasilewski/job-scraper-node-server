@@ -1,25 +1,34 @@
-type User {
-    id: String
-    title: String
-    completed: Boolean
+type ScrapeResp {
+    complete: Boolean
 }
 
-type NewsItem {
-    content: String
+type NewJob {
+    timestamp: String
+    link: String
+}
+
+type JobGroupNames {
+    names: [String]
+}
+
+type Filenames {
+    files: [String]
+}
+
+type DeleteFileResp {
+    deleted: Boolean
 }
 
 type Query {
-    getUsers: [User]
-    getUser(id: String!): User!
-    getFakeUsers: [User]
-    hello: NewsItem
+    getGroupNames: JobGroupNames
+    getScreenshotsByGroup(groupName: String): Filenames
 }
 
 type Mutation {
-    addFakeUser(id: String!, title: String!): User!
-    deleteFakeUser(id: String!): User!
+    scrape(host: String!, path: String!, jobAnchorSelector: String!, jobLinkContains: String!, numberOfPages: Int!): ScrapeResp
+    removeScreenshotByGroupAndUuid(groupName: String, uuid: String): DeleteFileResp
 }
 
 type Subscription {
-    news: NewsItem
+    newJobs: NewJob
 }

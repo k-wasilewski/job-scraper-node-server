@@ -35,6 +35,8 @@ export default async (port: number): Promise<Server> => {
 
   app.use('*', cors({ origin: 'http://localhost:3000' }));
 
+  app.use('/screenshots', express.static('C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/'))
+
   const apolloServer = new ApolloServer({
     playground: false,
     schema

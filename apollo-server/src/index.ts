@@ -1,5 +1,4 @@
 import { Server } from 'http';
-import { scrape } from './scraper';
 
 import startServer from './server';
 
@@ -31,12 +30,12 @@ try {
       console.log(`GraphQL Server is now running on http://localhost:${PORT}`);
     }
 
-    scrape(
+    /*scrape(
         'https://www.nofluffjobs.com',
         '/jobs/remote/fullstack?criteria=city%3Dwarszawa%20%20requirement%3Djava,react&page={}',
         'a[class*="posting-list-item"]',
         'job',
-        2
+        2,
     );
     scrape(
         'https://bulldogjob.pl',
@@ -79,7 +78,7 @@ try {
         'a[data-test="offer-link"]',
         'praca',
         1
-    )
+    )*/
 
     server = serverInstance;
   });

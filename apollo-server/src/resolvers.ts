@@ -1,90 +1,57 @@
-import axios from "axios";
 import { PubSub } from "graphql-subscriptions";
-import {addDbUser, deleteDbUser} from "./mongodb";
-
-const pubsub = new PubSub();
-
-const fakeDatabase = {
-  users: [
-    {
-      id: "-1",
-      title: "FAKE USERR",
-      completed: false
-    }
-  ]
-}
-
-
-let i = 0;
-
-setInterval(() => {
-  pubsub.publish('news', { news: { content: `info-${i++}`} });
-}, 5000);
+import {scrape} from './scraper';
+import {getDirectories, getFilenames, removeFile} from "./utils";
+//TODO: run scraper on Spring's request and notify dashboard how many new offers were found, keep results in db
+export const pubsub = new PubSub();
 
 export default {
   Query: {
-    getUsers: async () => {
+    getGroupNames: async () => {
       try {
-        const users = await axios.get("https://jsonplaceholder.typicode.com/todos");
-        return users.data.map((user: { id: string, title: string, completed: boolean }) => {
-          const { id, title, completed } = user;
-
-          return {
-            id,
-            title,
-            completed
-          }
-        });
+        return { names: getDirectories('C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots') };
       } catch (error) {
         throw error;
       }
     },
-    getUser: async (_: any, args: { id: string }) => {
+    getScreenshotsByGroup: async (_: any, args: {
+      groupName: string,
+    }, __: any) => {
       try {
-        const user = await axios.get(
-            `https://jsonplaceholder.typicode.com/todos/${args.id}`
-        );
-        return {
-          id: user.data.id,
-          title: user.data.title,
-          completed: user.data.completed
-        };
+        return { files: getFilenames(`C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/${args.groupName}`) };
       } catch (error) {
         throw error;
       }
     },
-    getFakeUsers: async () => {
+  },
+  Mutation: {
+    scrape: async (_: any, args: {
+      host: string,
+      path: string,
+      jobAnchorSelector: string,
+      jobLinkContains: string,
+      numberOfPages: number,
+      }, __: any) => {
+      const _host = args.host.split('&quot').join('"');
+      const _path = args.path.split('&quot').join('"');
+      const _jobAnchorSelector = args.jobAnchorSelector.split('&quot').join('"');
+      const _jobLinkContains = args.jobLinkContains.split('&quot').join('"');
+      return await scrape(_host, _path, _jobAnchorSelector, _jobLinkContains, args.numberOfPages)
+    },
+    removeScreenshotByGroupAndUuid: async (_: any, args: {
+      groupName: string,
+      uuid: string
+    }, __: any) => {
       try {
-        return fakeDatabase.users;
+        removeFile(`C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/${args.groupName}/_${args.uuid}.png`)
+        return { deleted: removeFile(`C:/Users/SG0313107/Documents/next-graphql-server/apollo-server/screenshots/${args.groupName}/${args.uuid}.png`) };
       } catch (error) {
         throw error;
       }
     }
   },
-  Mutation: {
-    addFakeUser: async (_: any, args: { id: string, title: string }, __: any) => {
-      const user = {
-        id: args.id,
-        title: args.title,
-        completed: true
-      };
-      fakeDatabase.users.push(user);
-      addDbUser(user);
-      return user;
-    },
-    deleteFakeUser: async (_: any, args: { id: string }, __: any) => {
-      var removeIndex = fakeDatabase.users.map(u => u.id).indexOf(args.id);
-      const user = Object.assign({}, fakeDatabase.users.find((user, i) => {
-        return user.id === args.id;
-      }));
-      if (removeIndex !== -1) fakeDatabase.users.splice(removeIndex, 1);
-      deleteDbUser(user);
-      return user;
-    },
-  },
   Subscription: {
-    news: {
-      subscribe: () => pubsub.asyncIterator(['news'])
+    newJobs: {
+      subscribe: () => pubsub.asyncIterator(['newJobs'])
     }
   }
 };

@@ -1,45 +1,65 @@
-import {AnyError, InsertOneResult} from "mongodb";
+import {AnyError} from "mongodb";
 // @ts-ignore
-import {MongoClient} from "mongodb/mongodb";
+import {DeleteResult, InsertOneResult, MongoClient, UpdateResult} from "mongodb/mongodb";
+import { pubsub } from "./resolvers";
 
 const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 const URL = 'mongodb://localhost:27017';
 const DB = 'scraping_db';
-const COLLECTION = 'fake_users';
+const COLLECTION = 'jobs';
 
-interface User {
-    id: string;
-    title: string;
-    completed: boolean;
+export interface Job {
+    uuid?: string;
+    host: string;
+    path: string;
+    link: string;
 }
 
-interface UserWithOperation extends User {
-    operation: UserOperation;
-}
-
-export const addDbUser = (user: User) => {
-    const userToAdd: UserWithOperation = {id: user.id, title: user.title, completed: user.completed, operation: UserOperation.ADD};
-    return insertToProducts(userToAdd);
-}
-
-export const deleteDbUser = (user: User) => {
-    const userToDelete: UserWithOperation = {id: user.id, title: user.title, completed: user.completed, operation: UserOperation.DELETE};
-    return insertToProducts(userToDelete);
-}
-
-enum UserOperation {
-    ADD, DELETE
-}
-
-const insertToProducts = (object: Object) => {
+export const insertToJobs = (job: Job) => {
+    if (!job.uuid) throw 'Job does not have an UUID assigned!';
     return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
         if (err) throw err;
         const dbo = db.db(DB);
-        dbo.collection(COLLECTION).insertOne(object, (err?: AnyError, res?: InsertOneResult) => {
+        dbo.collection(COLLECTION).insertOne(job, (err?: AnyError, res?: InsertOneResult) => {
            if (err) throw err;
            db.close();
-           return `${JSON.stringify(object)} has been inserted`;
+            pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
+           return `${JSON.stringify(job)} has been inserted`;
+        });
+    });
+};
+
+export const getJobByLink = (link: string) => {
+    return MongoClient.connect(URL, async (err?: AnyError, db?: MongoClient) => {
+        if (err) throw err;
+        const dbo = db.db(DB);
+        const foundJobs = await dbo.collection(COLLECTION).find({ link }).toArray();
+        return foundJobs[0] || null;
+    });
+};
+
+export const deleteJobByUuid = (uuid: string) => {
+    return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
+        if (err) throw err;
+        const dbo = db.db(DB);
+        dbo.collection(COLLECTION).deleteOne({ uuid }, (err?: AnyError, res?: DeleteResult) => {
+            if (err) throw err;
+            db.close();
+            return `{ uuid: ${JSON.stringify(uuid)}} has been removed`;
+        });
+    });
+};
+
+export const updateJobByUuid = (job: Job) => {
+    if (!job.uuid) throw 'Job does not have an UUID assigned!';
+    return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
+        if (err) throw err;
+        const dbo = db.db(DB);
+        dbo.collection(COLLECTION).updateOne({ uuid: job.uuid }, { $set: job }, (err?: AnyError, res?: UpdateResult) => {
+            if (err) throw err;
+            db.close();
+            return `${JSON.stringify(job)} has been updated`;
         });
     });
 };
