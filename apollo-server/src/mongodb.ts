@@ -24,7 +24,7 @@ export const insertToJobs = (job: Job) => {
         dbo.collection(COLLECTION).insertOne(job, (err?: AnyError, res?: InsertOneResult) => {
            if (err) throw err;
            db.close();
-            pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
+           pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
            return `${JSON.stringify(job)} has been inserted`;
         });
     });

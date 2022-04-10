@@ -2,6 +2,8 @@ import puppeteer from 'puppeteer';
 import fs from 'fs';
 //import {getJobByLink, insertToJobs, Job} from "./mongodb";
 import {generateUUID, getPath, getWebpageName} from "./utils";
+import {Job} from "./mongodb";
+import {pubsub} from "./resolvers";
 
 export const scrape = async (
     host: string,
@@ -31,9 +33,10 @@ export const scrape = async (
         );
 
         const name = getWebpageName(host);
+        // @ts-ignore
         fs.mkdirSync('./screenshots/' + name, { recursive: true });
 
-        for (const job of arr) {
+        for (const job of arr) {//TODO: remove mock pubsub.publish, uncomment persisting jobs at mongodb
             if (!job.includes(jobLinkContains)) continue;
 
             const jobPage = await browser.newPage();
@@ -48,7 +51,12 @@ export const scrape = async (
                 uuid = generateUUID();
                 mongodbRecord.uuid = uuid;
                 insertToJobs(mongodbRecord);
-            }*/const uuid = generateUUID()
+            }*/
+            const uuid = generateUUID();
+            const mongodbRecord: Job = { host, path, link: jobLink };
+            mongodbRecord.uuid = uuid;
+            pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
+            ////////////////////////////
 
             await jobPage.goto(jobLink);
             await jobPage.screenshot({path: './screenshots/' + name + '/' + uuid + '.png', fullPage: true});
