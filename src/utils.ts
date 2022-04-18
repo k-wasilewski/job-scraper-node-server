@@ -33,5 +33,6 @@ export const removeFile = (path: string) => {
             return false;
         }
         return true;
-    })
+    });
+    return false;
 }

@@ -2,6 +2,7 @@ import { PubSub } from "graphql-subscriptions";
 import {scrape} from './scraper';
 import {getDirectories, getFilenames, removeFile} from "./utils";
 import {SCREENSHOTS_PATH} from "./server";
+import {deleteJobByUuid} from "./mongodb";
 //TODO: run scraper on Spring's request and notify dashboard how many new offers were found, keep results in db
 export const pubsub = new PubSub();
 
@@ -43,8 +44,9 @@ export default {
       uuid: string
     }, __: any) => {
       try {
-        removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/_${args.uuid}.png`)
-        return { deleted: removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/${args.uuid}.png`) };
+        const scrRemoved = removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/_${args.uuid}.png`);
+        const jobRemoved = deleteJobByUuid(args.uuid);
+        return { deleted: scrRemoved && jobRemoved };
       } catch (error) {
         throw error;
       }

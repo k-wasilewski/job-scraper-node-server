@@ -28,7 +28,7 @@ function graphiqlExpress(options: GraphiQL.GraphiQLData | ExpressGraphQLOptionsF
   return graphiqlHandler;
 }
 
-export const SCREENSHOTS_PATH = 'C:/Users/SG0313107/Documents/next-graphql-server/screenshots/'
+export const SCREENSHOTS_PATH = 'C:/Users/SG0313107/Documents/job-scraper-node-server/screenshots/'
 
 export default async (port: number): Promise<Server> => {
   const app = express();
