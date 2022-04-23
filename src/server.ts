@@ -9,6 +9,7 @@ import { execute, subscribe } from 'graphql';
 import { createServer, Server } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import * as url from 'url';
+import * as path from "path";
 
 type ExpressGraphQLOptionsFunction = (req?: express.Request, res?: express.Response) => any | Promise<any>;
 
@@ -28,7 +29,7 @@ function graphiqlExpress(options: GraphiQL.GraphiQLData | ExpressGraphQLOptionsF
   return graphiqlHandler;
 }
 
-export const SCREENSHOTS_PATH = 'C:/Users/SG0313107/Documents/job-scraper-node-server/screenshots/'
+export const SCREENSHOTS_PATH = path.join(__dirname, '..', 'screenshots');
 
 export default async (port: number): Promise<Server> => {
   const app = express();
