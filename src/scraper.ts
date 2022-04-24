@@ -11,7 +11,12 @@ export const scrape = async (
     jobLinkContains: string,
     numberOfPages: number
 ) => {
-    const browser = await puppeteer.launch({});
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: process.env.CHROME_BIN || null,
+        args: ['--no-sandbox', '--headless', '--disable-gpu', '--disable-dev-shm-usage'],
+    });
+
     const page = await browser.newPage();
 
     for (let i=1; i<=numberOfPages; i++) {
@@ -22,6 +27,7 @@ export const scrape = async (
         }
 
         await page.waitForSelector(jobAnchorSelector)
+
         const arr = await page.evaluate(
             (jobAnchorSelector) => {
                 return Array.from(
