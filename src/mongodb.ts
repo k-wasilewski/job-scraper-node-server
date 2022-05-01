@@ -5,7 +5,7 @@ import { pubsub } from "./resolvers";
 
 const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
-const URL = 'mongodb://localhost:27017';
+const URL = 'mongodb://sa:password@mongodb:27017';
 const DB = 'scraping_db';
 const COLLECTION = 'jobs';
 

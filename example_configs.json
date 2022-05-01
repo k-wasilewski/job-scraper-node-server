@@ -1,0 +1,44 @@
+[
+  {
+    "host": "https://www.nofluffjobs.com",
+    "path": "/jobs/remote/fullstack?criteria=city%3Dwarszawa%20%20requirement%3Djava,react&page={}",
+    "jobAnchorSelector": "a[class*=\"posting-list-item\"]",
+    "jobLinkContains": "job",
+    "numberOfPages": 2
+  },
+  {
+    "host": "https://bulldogjob.pl",
+    "path": "/companies/jobs/s/city,Remote,Warszawa/role,fullstack/skills,Java,JavaScript/page.{}",
+    "jobAnchorSelector": "a[class*=\"absolute top-0 left-0 w-full h-full\"]",
+    "jobLinkContains": "jobs",
+    "numberOfPages": 1
+  },
+  {
+    "host": "https://justjoin.it",
+    "path": "/remote/javascript",
+    "jobAnchorSelector": "a[class*=\"jss\"]",
+    "jobLinkContains": "offers",
+    "numberOfPages": 1
+  },
+  {
+    "host": "https://justjoin.it",
+    "path": "/remote-poland/java",
+    "jobAnchorSelector": "a[class*=\"jss\"]",
+    "jobLinkContains": "offers",
+    "numberOfPages": 1
+  },
+  {
+    "host": "https://it.pracuj.pl",
+    "path": "/?wp=Warszawa&tt=React.js&s=fullstack&rw=true",
+    "jobAnchorSelector": "a[data-test=\"offer-link\"]",
+    "jobLinkContains": "praca",
+    "numberOfPages": 1
+  },
+  {
+    "host": "https://it.pracuj.pl",
+    "path": "/?wp=Warszawa&tt=Java&s=fullstack&rw=true",
+    "jobAnchorSelector": "a[data-test=\"offer-link\"]",
+    "jobLinkContains": "praca",
+    "numberOfPages": 1
+  }
+]

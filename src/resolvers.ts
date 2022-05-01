@@ -3,7 +3,7 @@ import {scrape} from './scraper';
 import {getDirectories, getFilenames, removeFile} from "./utils";
 import {SCREENSHOTS_PATH} from "./server";
 import {deleteJobByUuid} from "./mongodb";
-//TODO: run scraper on Spring's request and notify dashboard how many new offers were found, keep results in db
+
 export const pubsub = new PubSub();
 
 export default {
