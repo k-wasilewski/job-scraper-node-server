@@ -19,14 +19,38 @@ type DeleteFileResp {
     deleted: Boolean
 }
 
+type Error {
+    message: String
+}
+
+type User {
+    uuid: String!
+    email: String!
+    password: String!
+}
+
+type UserResponse {
+    user: User
+}
+
+type AuthResponse {
+    success: Boolean!
+    error: Error
+    token: String
+    user: User
+}
+
 type Query {
     getGroupNames: JobGroupNames
     getScreenshotsByGroup(groupName: String): Filenames
+    verify: UserResponse
 }
 
 type Mutation {
     scrape(host: String!, path: String!, jobAnchorSelector: String!, jobLinkContains: String!, numberOfPages: Int!): ScrapeResp
     removeScreenshotByGroupAndUuid(groupName: String, uuid: String): DeleteFileResp
+    login(email: String!, password: String!): AuthResponse
+    register(email: String!, password: String!): AuthResponse
 }
 
 type Subscription {

@@ -10,6 +10,7 @@ import { createServer, Server } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import * as url from 'url';
 import * as path from "path";
+import {getUserFromToken} from "./auth";
 
 type ExpressGraphQLOptionsFunction = (req?: express.Request, res?: express.Response) => any | Promise<any>;
 
@@ -42,7 +43,15 @@ export default async (port: number): Promise<Server> => {
 
   const apolloServer = new ApolloServer({
     playground: false,
-    schema
+    schema,
+    context: ({ req }: { req: Request }) => {
+        if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
+            !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/)) {
+            const token = (req.headers as HeadersWithAuth).authorization.split(' ')[1] || '';
+            const user = getUserFromToken(token);
+            return { user };
+        }
+    }
   });
 
   apolloServer.applyMiddleware({ app, path: '/graphql' });
@@ -81,3 +90,11 @@ export default async (port: number): Promise<Server> => {
     });
   });
 };
+
+interface HeadersWithAuth extends Headers {
+    authorization: string;
+}
+
+interface GraphqlBody extends ReadableStream<Uint8Array> {
+    query: string;
+}
