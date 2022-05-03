@@ -71,13 +71,11 @@ export const updateJobByUuid = (job: Job) => {
     });
 };
 
-export const findUserByEmail = (email: string) => {
-    return MongoClient.connect(URL, async (err?: AnyError, db?: MongoClient) => {
-        if (err) throw err;
-        const dbo = db.db(DB);
-        const foundUser = await dbo.collection(USERS_COLLECTION).findOne({ email });
-        return foundUser;
-    });
+export const findUserByEmail = async (email: string) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    const foundUser = await dbo.collection(USERS_COLLECTION).findOne({ email });
+    return foundUser;
 };
 
 export const insertToUsers = (user: User) => {

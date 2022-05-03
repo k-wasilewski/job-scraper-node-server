@@ -1,4 +1,5 @@
 import {findUserByEmail, insertToUsers, User} from "./mongodb";
+import {generateUUID} from "./utils";
 
 const JWT_SECRET = 'UYGgyugf896tGhgOGkjh76G';
 
@@ -10,9 +11,9 @@ export const register: (email: string, password: string) => Promise<AuthResponse
         if (!email || !password) return { success: false, error: { message: 'Both email and password are required.' } };
         else if (!isValidEmail(email)) return { success: false, error: { message: 'Email does not meet requirements.' } };
         else if (!isValidPwd(password)) return { success: false, error: { message: 'Password does not meet requirements.' } };
-        else if (findUserByEmail(email)) return { success: false, error: { message: 'User with such email already exists.' } };
+        else if (await findUserByEmail(email)) return { success: false, error: { message: 'User with such email already exists.' } };
 
-        const uuid = '9299e79e-8c80-41cd-8e6b-c65f1627c66c'//generateUUID();
+        const uuid = generateUUID();
         const hashedPwd = await bcrypt.hash(password, 10);
         const token = jwt.sign({ uuid, email }, JWT_SECRET, { expiresIn: '2h' });
         const user: User = { uuid, email, password: hashedPwd };
@@ -30,7 +31,7 @@ export const login: (email: string, password: string) => Promise<AuthResponse> =
     else if (!isValidEmail(email)) return { success: false, error: { message: 'Email does not meet requirements.' } };
     else if (!isValidPwd(password)) return { success: false, error: { message: 'Password does not meet requirements.' } };
 
-    const user = findUserByEmail(email);
+    const user = await findUserByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
         const token = jwt.sign({ uuid: user.uuid, email }, JWT_SECRET, { expiresIn: '2h' });
         return { success: true, token, user };
@@ -55,10 +56,10 @@ const getTokenPayload = (token: string) => {
     return jwt.verify(token, JWT_SECRET);
 }
 
-export const getUserFromToken = (token: string) => {
+export const getUserFromToken = async (token: string) => {
     if (token) {
         const { uuid, email } = getTokenPayload(token);
-        const user = findUserByEmail(email);
+        const user = await findUserByEmail(email);
         if (user.uuid !== uuid) throw new Error('Not authenticated');
         return user;
     }
