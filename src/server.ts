@@ -85,13 +85,13 @@ export default async (port: number): Promise<Server> => {
                 connectionParams: IWebSocketConnectionParams
             ) => {
                 if (connectionParams.token) {
-                    const user = await getUserFromToken(connectionParams.token);
+                    const token = connectionParams.token.split(' ')[1] || '';
+                    const user = await getUserFromToken(token);
                     const _user = findUserByEmail(user.email);
                     if (_user) {
-                        const context = {
-                            subscribeUser: _user
-                        }
-                        return context;
+                        return {
+                            user
+                        };
                     }
                 }
             }
