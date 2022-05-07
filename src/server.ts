@@ -11,6 +11,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import * as url from 'url';
 import * as path from "path";
 import {getUserFromToken} from "./auth";
+import {findUserByEmail} from "./mongodb";
 
 type ExpressGraphQLOptionsFunction = (req?: express.Request, res?: express.Response) => any | Promise<any>;
 
@@ -51,7 +52,7 @@ export default async (port: number): Promise<Server> => {
             const user = getUserFromToken(token);
             return { user };
         }
-    }
+    },
   });
 
   apolloServer.applyMiddleware({ app, path: '/graphql' });
@@ -79,7 +80,21 @@ export default async (port: number): Promise<Server> => {
         {
           execute,
           schema,
-          subscribe
+          subscribe,
+            onConnect: async (
+                connectionParams: IWebSocketConnectionParams
+            ) => {
+                if (connectionParams.token) {
+                    const user = await getUserFromToken(connectionParams.token);
+                    const _user = findUserByEmail(user.email);
+                    if (_user) {
+                        const context = {
+                            subscribeUser: _user
+                        }
+                        return context;
+                    }
+                }
+            }
         },
         {
           path: '/subscriptions',
@@ -97,4 +112,8 @@ interface HeadersWithAuth extends Headers {
 
 interface GraphqlBody extends ReadableStream<Uint8Array> {
     query: string;
+}
+
+interface IWebSocketConnectionParams {
+    token: string;
 }
