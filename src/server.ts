@@ -2,9 +2,7 @@ import { ApolloServer } from 'apollo-server-express';
 import * as GraphiQL from 'apollo-server-module-graphiql';
 import * as cors from 'cors';
 import * as express from 'express';
-
 import schema from './schema';
-
 import { execute, subscribe } from 'graphql';
 import { createServer, Server } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
@@ -12,6 +10,8 @@ import * as url from 'url';
 import * as path from "path";
 import {getUserFromToken} from "./auth";
 import {findUserByEmail} from "./mongodb";
+import {Response} from "express";
+import cookieParser from 'cookie-parser';
 
 type ExpressGraphQLOptionsFunction = (req?: express.Request, res?: express.Response) => any | Promise<any>;
 
@@ -38,20 +38,24 @@ export default async (port: number): Promise<Server> => {
 
   const server: Server = createServer(app);
 
-  app.use('*', cors({ origin: 'http://localhost:3000' }));
+  app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
-  app.use('/screenshots', express.static(SCREENSHOTS_PATH))
+  app.use('/screenshots', express.static(SCREENSHOTS_PATH));
+
+  app.use(cookieParser());
 
   const apolloServer = new ApolloServer({
     playground: false,
     schema,
-    context: ({ req }: { req: Request }) => {
+    context: ({ req, res }: { req: RequestWithCookies, res: Response }) => {
+        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
         if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
-            !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/)) {
-            const token = (req.headers as HeadersWithAuth).authorization.split(' ')[1] || '';
+            !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/) &&
+            req.headers['origin'] !== 'job-scraper-spring-server:8081') {
+            const token = req.cookies.authToken || '';
             const user = getUserFromToken(token);
             return { user };
-        }
+        } else return { req };
     },
   });
 
@@ -82,10 +86,11 @@ export default async (port: number): Promise<Server> => {
           schema,
           subscribe,
             onConnect: async (
-                connectionParams: IWebSocketConnectionParams
+                connectionParams: IWebSocketConnectionParams,
+                webSocket: IWebSocket
             ) => {
-                if (connectionParams.token) {
-                    const token = connectionParams.token.split(' ')[1] || '';
+              const token = getAuthCookie(webSocket.upgradeReq.headers.cookie);
+                if (token) {
                     const user = await getUserFromToken(token);
                     const _user = findUserByEmail(user.email);
                     if (_user) {
@@ -106,8 +111,14 @@ export default async (port: number): Promise<Server> => {
   });
 };
 
-interface HeadersWithAuth extends Headers {
-    authorization: string;
+const getAuthCookie = (str: string) => {
+    const authTokenMa = /(^|; )authToken=([^;]*)($|;)/.exec(str);
+    const authToken = authTokenMa ? authTokenMa[2] : null;
+    return authToken ? authToken.charAt(authToken.length-1) === ';' ? authToken.slice(0, -1) : authToken : null;
+}
+
+interface RequestWithCookies extends Request {
+    cookies: { authToken: string };
 }
 
 interface GraphqlBody extends ReadableStream<Uint8Array> {
@@ -116,4 +127,12 @@ interface GraphqlBody extends ReadableStream<Uint8Array> {
 
 interface IWebSocketConnectionParams {
     token: string;
+}
+
+interface IWebSocket {
+    upgradeReq: {
+        headers: {
+            cookie: any
+        }
+    }
 }

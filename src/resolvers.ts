@@ -1,6 +1,6 @@
 import { PubSub } from "graphql-subscriptions";
 import {scrape} from './scraper';
-import {getDirectories, getFilenames, removeFile} from "./utils";
+import {getDirectories, getFilenames, removeDir, removeFile} from "./utils";
 import {SCREENSHOTS_PATH} from "./server";
 import {deleteJobByUuid, User} from "./mongodb";
 import {login, register} from "./auth";
@@ -58,9 +58,29 @@ export default {
     }, context: { user: User }) => {
       if (!context.user) throw authError('Unauthorized');
       try {
-        const scrRemoved = removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/_${args.uuid}.png`);
+        const scrRemoved = removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/${args.uuid}.png`);
         const jobRemoved = deleteJobByUuid(args.uuid);
         return { deleted: scrRemoved && jobRemoved };
+      } catch (error) {
+        throw error;
+      }
+    },
+    removeAllScreenshotsByGroup: async (_: any, args: {
+      groupName: string
+    }, context: { user: User}) => {
+      if (!context.user) throw authError('Unauthorized');
+      try {
+        const jobsOfGroup = getFilenames(`${SCREENSHOTS_PATH}/${args.groupName}`);
+        const jobsToRemove = jobsOfGroup.length;
+        let jobsRemoved = 0;
+        jobsOfGroup.forEach(jobUuid => {
+          removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/${jobUuid}.png`);
+          deleteJobByUuid(jobUuid);
+          jobsRemoved++;
+        });
+        const success = jobsToRemove === jobsRemoved;
+        if (success) removeDir(`${SCREENSHOTS_PATH}/${args.groupName}`);
+        return { deleted: success };
       } catch (error) {
         throw error;
       }
@@ -68,11 +88,15 @@ export default {
     login: async (_: any, args: {
       email: string,
       password: string
-    }, __: any) => {
+    }, {req}: any) => {
       try {
         const { success, error, token, user } = await login(args.email, args.password);
         if (success && token && user) {
-          return { success, code: 200, token, user };
+          req.res.cookie('authToken', token, {
+            httpOnly: true,
+            maxAge: 2 * 60 * 60 * 1000
+          });
+          return { success, code: 200, user };
         } else if (error) {
           throw clientError(error.message);
         }
@@ -83,11 +107,15 @@ export default {
     register: async (_: any, args: {
       email: string,
       password: string
-    }, __: any) => {
+    }, {req}: any) => {
       try {
         const { success, error, token, user } =  await register(args.email, args.password);
         if (success && token && user) {
-          return { success, code: 200, token, user };
+          req.res.cookie('authToken', token, {
+            httpOnly: true,
+            maxAge: 2 * 60 * 60 * 1000
+          });
+          return { success, code: 200, user };
         } else if (error) {
           throw clientError(error.message);
         }

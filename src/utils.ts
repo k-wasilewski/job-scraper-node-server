@@ -24,8 +24,7 @@ export const getDirectories = (path: string) =>
         fs.statSync(path+'/'+subdir).isDirectory());
 
 export const getFilenames = (path: string) =>
-    fs.readdirSync(path).map((file: string) =>
-        /(.*)\.[a-z]*/.exec(file)[1]).filter(filename => filename[0] !== '_');
+    fs.readdirSync(path).map((file: string) => /(.*)\.[a-z]*/.exec(file)[1]);
 
 export const removeFile = (path: string) => {
     return fs.unlink(path, (error) => {
@@ -35,4 +34,13 @@ export const removeFile = (path: string) => {
         return true;
     });
     return false;
+}
+
+export const removeDir = (path: string) => {
+    return fs.rmdir(path, (err) => {
+        if (err) {
+            return false;
+        }
+        return true;
+    });
 }

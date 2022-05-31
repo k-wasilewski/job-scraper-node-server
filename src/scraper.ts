@@ -63,7 +63,6 @@ export const scrape = async (
 
             await jobPage.goto(jobLink);
             await jobPage.screenshot({path: './screenshots/' + name + '/' + uuid + '.png', fullPage: true});
-            await jobPage.screenshot({path: './screenshots/' + name + '/_' + uuid + '.png'});
         }
     }
 

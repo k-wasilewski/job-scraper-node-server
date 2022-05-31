@@ -36,7 +36,6 @@ type UserResponse {
 type AuthResponse {
     success: Boolean!
     error: Error
-    token: String
     user: User
 }
 
@@ -49,6 +48,7 @@ type Query {
 type Mutation {
     scrape(host: String!, path: String!, jobAnchorSelector: String!, jobLinkContains: String!, numberOfPages: Int!): ScrapeResp
     removeScreenshotByGroupAndUuid(groupName: String, uuid: String): DeleteFileResp
+    removeAllScreenshotsByGroup(groupName: String): DeleteFileResp
     login(email: String!, password: String!): AuthResponse
     register(email: String!, password: String!): AuthResponse
 }
