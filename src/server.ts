@@ -8,7 +8,7 @@ import { createServer, Server } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import * as url from 'url';
 import * as path from "path";
-import {getUserFromToken} from "./auth";
+import {getSpringScrapeUserFromToken, getUserFromToken} from "./auth";
 import {findUserByEmail} from "./mongodb";
 import {Response} from "express";
 import cookieParser from 'cookie-parser';
@@ -54,6 +54,12 @@ export default async (port: number): Promise<Server> => {
             req.headers['origin'] !== 'job-scraper-spring-server:8081') {
             const token = req.cookies.authToken || '';
             const user = getUserFromToken(token);
+            return { user };
+        } else if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
+            !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/) &&
+            req.headers['origin'] === 'job-scraper-spring-server:8081') {
+            const token = req.cookies.authToken || '';
+            const user = getSpringScrapeUserFromToken(token);
             return { user };
         } else return { req };
     },

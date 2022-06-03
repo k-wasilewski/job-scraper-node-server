@@ -2,6 +2,8 @@ import {findUserByEmail, insertToUsers, User} from "./mongodb";
 import {generateUUID} from "./utils";
 
 const JWT_SECRET = 'UYGgyugf896tGhgOGkjh76G';
+const SPRING_SCRAPE_EMAIL = "spring_scrape";
+const SPRING_SCRAPE_UUID = "606597f4-8e3d-4d42-9d3e-241feee6b9ec";
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -27,6 +29,11 @@ export const register: (email: string, password: string) => Promise<AuthResponse
 };
 
 export const login: (email: string, password: string) => Promise<AuthResponse> = async (email: string, password: string) => {
+    if (email === SPRING_SCRAPE_EMAIL && password === JWT_SECRET) {
+        const token = jwt.sign({ uuid: SPRING_SCRAPE_UUID, email }, JWT_SECRET, { expiresIn: '2h' });
+        return { success: true, token, user: { email: SPRING_SCRAPE_EMAIL } };
+    }
+
     if (!email || !password) return { success: false, error: { message: 'Both email and password are required.' } };
     else if (!isValidEmail(email)) return { success: false, error: { message: 'Email does not meet requirements.' } };
     else if (!isValidPwd(password)) return { success: false, error: { message: 'Password does not meet requirements.' } };
@@ -62,6 +69,15 @@ export const getUserFromToken = async (token: string) => {
         const user = await findUserByEmail(email);
         if (user.uuid !== uuid) throw new Error('Not authenticated');
         return user;
+    }
+
+    throw new Error('Not authenticated');
+}
+
+export const getSpringScrapeUserFromToken = async (token: string) => {
+    if (token) {
+        const { uuid, email } = getTokenPayload(token);
+        return email === SPRING_SCRAPE_EMAIL && uuid === SPRING_SCRAPE_UUID && { user: { email: SPRING_SCRAPE_EMAIL } };
     }
 
     throw new Error('Not authenticated');
