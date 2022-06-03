@@ -5,6 +5,7 @@ import {generateUUID, getPath, getWebpageName} from "./utils";
 import {pubsub} from "./resolvers";
 
 export const scrape = async (
+    email: string,
     host: string,
     path: string,
     jobAnchorSelector: string,
@@ -39,7 +40,7 @@ export const scrape = async (
 
         const name = getWebpageName(host);
         // @ts-ignore
-        fs.mkdirSync('./screenshots/' + name, { recursive: true });
+        fs.mkdirSync('./screenshots/' + email + '/' + name, { recursive: true });
 
         for (const job of arr) {
             if (!job.includes(jobLinkContains)) continue;
@@ -62,7 +63,7 @@ export const scrape = async (
             }
 
             await jobPage.goto(jobLink);
-            await jobPage.screenshot({path: './screenshots/' + name + '/' + uuid + '.png', fullPage: true});
+            await jobPage.screenshot({path: './screenshots/' + email + '/' + name + '/' + uuid + '.png', fullPage: true});
         }
     }
 

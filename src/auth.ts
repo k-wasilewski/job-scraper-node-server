@@ -74,10 +74,10 @@ export const getUserFromToken = async (token: string) => {
     throw new Error('Not authenticated');
 }
 
-export const getSpringScrapeUserFromToken = async (token: string) => {
+export const getSpringScrapeUserFromToken = (token: string) => {
     if (token) {
         const { uuid, email } = getTokenPayload(token);
-        return email === SPRING_SCRAPE_EMAIL && uuid === SPRING_SCRAPE_UUID && { user: { email: SPRING_SCRAPE_EMAIL } };
+        return email === SPRING_SCRAPE_EMAIL && uuid === SPRING_SCRAPE_UUID && { email: SPRING_SCRAPE_EMAIL };
     }
 
     throw new Error('Not authenticated');

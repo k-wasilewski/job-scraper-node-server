@@ -1,7 +1,7 @@
 import { PubSub } from "graphql-subscriptions";
 import {scrape} from './scraper';
 import {getDirectories, getFilenames, removeDir, removeFile} from "./utils";
-import {SCREENSHOTS_PATH} from "./server";
+import {getUsersScreenshotsPath} from "./server";
 import {deleteJobByUuid, User} from "./mongodb";
 import {login, register} from "./auth";
 
@@ -12,7 +12,8 @@ export default {
     getGroupNames: async (_: any, args: {}, context: { user: User }) => {
       if (!context.user) throw authError('Unauthorized');
       try {
-        return { names: getDirectories(SCREENSHOTS_PATH) };
+        const dir = getUsersScreenshotsPath(context.user.email);
+        return { names: getDirectories(dir) };
       } catch (error) {
         throw error;
       }
@@ -22,7 +23,8 @@ export default {
     }, context: { user: User }) => {
       if (!context.user) throw authError('Unauthorized');
       try {
-        return { files: getFilenames(`${SCREENSHOTS_PATH}/${args.groupName}`) };
+        const dir = getUsersScreenshotsPath(context.user.email);
+        return { files: getFilenames(`${dir}/${args.groupName}`) };
       } catch (error) {
         throw error;
       }
@@ -50,7 +52,7 @@ export default {
       const _path = args.path.replace(/&quot/g, '"');
       const _jobAnchorSelector = args.jobAnchorSelector.replace(/&quot/g, '"');
       const _jobLinkContains = args.jobLinkContains.replace(/&quot/g, '"');
-      return await scrape(_host, _path, _jobAnchorSelector, _jobLinkContains, args.numberOfPages)
+      return await scrape(context.user.email, _host, _path, _jobAnchorSelector, _jobLinkContains, args.numberOfPages)
     },
     removeScreenshotByGroupAndUuid: async (_: any, args: {
       groupName: string,
@@ -58,7 +60,8 @@ export default {
     }, context: { user: User }) => {
       if (!context.user) throw authError('Unauthorized');
       try {
-        const scrRemoved = removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/${args.uuid}.png`);
+        const dir = getUsersScreenshotsPath(context.user.email);
+        const scrRemoved = removeFile(`${dir}/${args.groupName}/${args.uuid}.png`);
         const jobRemoved = deleteJobByUuid(args.uuid);
         return { deleted: scrRemoved && jobRemoved };
       } catch (error) {
@@ -70,16 +73,17 @@ export default {
     }, context: { user: User}) => {
       if (!context.user) throw authError('Unauthorized');
       try {
-        const jobsOfGroup = getFilenames(`${SCREENSHOTS_PATH}/${args.groupName}`);
+        const dir = getUsersScreenshotsPath(context.user.email);
+        const jobsOfGroup = getFilenames(`${dir}/${args.groupName}`);
         const jobsToRemove = jobsOfGroup.length;
         let jobsRemoved = 0;
         jobsOfGroup.forEach(jobUuid => {
-          removeFile(`${SCREENSHOTS_PATH}/${args.groupName}/${jobUuid}.png`);
+          removeFile(`${dir}/${args.groupName}/${jobUuid}.png`);
           deleteJobByUuid(jobUuid);
           jobsRemoved++;
         });
         const success = jobsToRemove === jobsRemoved;
-        if (success) removeDir(`${SCREENSHOTS_PATH}/${args.groupName}`);
+        if (success) removeDir(`${dir}/${args.groupName}`);
         return { deleted: success };
       } catch (error) {
         throw error;

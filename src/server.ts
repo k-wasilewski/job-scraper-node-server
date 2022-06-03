@@ -33,6 +33,10 @@ function graphiqlExpress(options: GraphiQL.GraphiQLData | ExpressGraphQLOptionsF
 
 export const SCREENSHOTS_PATH = path.join(__dirname, '..', 'screenshots');
 
+export const getUsersScreenshotsPath = (email: string) => {
+    return path.join(SCREENSHOTS_PATH, email);
+}
+
 export default async (port: number): Promise<Server> => {
   const app = express();
 
