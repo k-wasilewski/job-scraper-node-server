@@ -3,13 +3,15 @@ import fs from 'fs';
 import {getJobByLink, insertToJobs, Job} from "./mongodb";
 import {generateUUID, getPath, getWebpageName} from "./utils";
 import {pubsub} from "./resolvers";
+import {SPRING_SCRAPE_UUID} from "./auth";
 
 export const scrape = async (
     host: string,
     path: string,
     jobAnchorSelector: string,
     jobLinkContains: string,
-    numberOfPages: number
+    numberOfPages: number,
+    userUuid?: string
 ) => {
     const browser = await puppeteer.launch({
         headless: true,
@@ -39,7 +41,7 @@ export const scrape = async (
 
         const name = getWebpageName(host);
         // @ts-ignore
-        fs.mkdirSync('./screenshots/' + name, { recursive: true });
+        fs.mkdirSync('./screenshots/' + userUuid + '/' + name, { recursive: true });
 
         for (const job of arr) {
             if (!job.includes(jobLinkContains)) continue;
@@ -61,8 +63,7 @@ export const scrape = async (
                 pubsub.publish('newJobs', payload);
             }
 
-            await jobPage.goto(jobLink);
-            await jobPage.screenshot({path: './screenshots/' + name + '/' + uuid + '.png', fullPage: true});
+            userUuid !== SPRING_SCRAPE_UUID && await jobPage.screenshot({path: './screenshots/' + userUuid + '/' + name + '/' + uuid + '.png', fullPage: true});
         }
     }
 

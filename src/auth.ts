@@ -3,7 +3,7 @@ import {generateUUID} from "./utils";
 
 const JWT_SECRET = 'UYGgyugf896tGhgOGkjh76G';
 const SPRING_SCRAPE_EMAIL = "spring_scrape";
-const SPRING_SCRAPE_UUID = "606597f4-8e3d-4d42-9d3e-241feee6b9ec";
+export const SPRING_SCRAPE_UUID = "606597f4-8e3d-4d42-9d3e-241feee6b9ec";
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -74,10 +74,10 @@ export const getUserFromToken = async (token: string) => {
     throw new Error('Not authenticated');
 }
 
-export const getSpringScrapeUserFromToken = async (token: string) => {
+export const getSpringScrapeUserFromToken = (token: string) => {
     if (token) {
         const { uuid, email } = getTokenPayload(token);
-        return email === SPRING_SCRAPE_EMAIL && uuid === SPRING_SCRAPE_UUID && { user: { email: SPRING_SCRAPE_EMAIL } };
+        return email === SPRING_SCRAPE_EMAIL && uuid === SPRING_SCRAPE_UUID && { email: SPRING_SCRAPE_EMAIL, uuid: SPRING_SCRAPE_UUID };
     }
 
     throw new Error('Not authenticated');
