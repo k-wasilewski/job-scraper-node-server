@@ -46,7 +46,7 @@ type Query {
 }
 
 type Mutation {
-    scrape(host: String!, path: String!, jobAnchorSelector: String!, jobLinkContains: String!, numberOfPages: Int!): ScrapeResp
+    scrape(host: String!, path: String!, jobAnchorSelector: String!, jobLinkContains: String!, numberOfPages: Int!, userUuid: String): ScrapeResp
     removeScreenshotByGroupAndUuid(groupName: String, uuid: String): DeleteFileResp
     removeAllScreenshotsByGroup(groupName: String): DeleteFileResp
     login(email: String!, password: String!): AuthResponse

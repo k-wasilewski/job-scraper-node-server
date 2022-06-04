@@ -33,8 +33,8 @@ function graphiqlExpress(options: GraphiQL.GraphiQLData | ExpressGraphQLOptionsF
 
 export const SCREENSHOTS_PATH = path.join(__dirname, '..', 'screenshots');
 
-export const getUsersScreenshotsPath = (email: string) => {
-    return path.join(SCREENSHOTS_PATH, email);
+export const getUsersScreenshotsPath = (uuid: string) => {
+    return path.join(SCREENSHOTS_PATH, uuid);
 }
 
 export default async (port: number): Promise<Server> => {
@@ -51,13 +51,13 @@ export default async (port: number): Promise<Server> => {
   const apolloServer = new ApolloServer({
     playground: false,
     schema,
-    context: ({ req, res }: { req: RequestWithCookies, res: Response }) => {
+    context: async ({ req, res }: { req: RequestWithCookies, res: Response }) => {
         res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
         if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
             !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/) &&
             req.headers['origin'] !== 'job-scraper-spring-server:8081') {
             const token = req.cookies.authToken || '';
-            const user = getUserFromToken(token);
+            const user = await getUserFromToken(token);
             return { user };
         } else if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
             !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/) &&
