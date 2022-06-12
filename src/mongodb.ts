@@ -2,6 +2,7 @@ import {AnyError} from "mongodb";
 // @ts-ignore
 import {DeleteResult, InsertOneResult, MongoClient, UpdateResult} from "mongodb/mongodb";
 import { pubsub } from "./resolvers";
+import {getWebpageName} from "./utils";
 
 const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
@@ -15,6 +16,7 @@ export interface Job {
     host: string;
     path: string;
     link: string;
+    userUuid: string;
 }
 
 export interface User {
@@ -23,53 +25,64 @@ export interface User {
     password: string;
 }
 
-export const insertToJobs = (job: Job) => {
+export const insertToJobs = async (job: Job) => {
     if (!job.uuid) throw 'Job does not have an UUID assigned!';
-    return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    await dbo.collection(JOBS_COLLECTION).insertOne(job, (err?: AnyError, res?: InsertOneResult) => {
         if (err) throw err;
-        const dbo = db.db(DB);
-        dbo.collection(JOBS_COLLECTION).insertOne(job, (err?: AnyError, res?: InsertOneResult) => {
-           if (err) throw err;
-           db.close();
-           pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
-           return `${JSON.stringify(job)} has been inserted`;
-        });
+        db.close();
+        pubsub.publish('newJobs', { newJobs: { timestamp: new Date().toString(), link: job.link } });
+        return `${JSON.stringify(job)} has been inserted`;
     });
 };
 
-export const getJobByLink = (link: string) => {
-    return MongoClient.connect(URL, async (err?: AnyError, db?: MongoClient) => {
+export const getJobByLink = async (userUuid: string, link: string) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    const foundJobs = await dbo.collection(JOBS_COLLECTION).find({ link, userUuid }).toArray();
+    return foundJobs[0] || null;
+};
+
+export const deleteJobByUuid = async (userUuid: string, uuid: string) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    await dbo.collection(JOBS_COLLECTION).deleteOne({ uuid, userUuid }, (err?: AnyError, res?: DeleteResult) => {
         if (err) throw err;
-        const dbo = db.db(DB);
-        const foundJobs = await dbo.collection(JOBS_COLLECTION).find({ link }).toArray();
-        return foundJobs[0] || null;
+        db.close();
+        return `{ uuid: ${JSON.stringify(uuid)}} has been removed`;
     });
 };
 
-export const deleteJobByUuid = (uuid: string) => {
-    return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
-        if (err) throw err;
-        const dbo = db.db(DB);
-        dbo.collection(JOBS_COLLECTION).deleteOne({ uuid }, (err?: AnyError, res?: DeleteResult) => {
-            if (err) throw err;
-            db.close();
-            return `{ uuid: ${JSON.stringify(uuid)}} has been removed`;
-        });
-    });
-};
-
-export const updateJobByUuid = (job: Job) => {
+export const updateJobByUuid = async (job: Job) => {
     if (!job.uuid) throw 'Job does not have an UUID assigned!';
-    return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    await dbo.collection(JOBS_COLLECTION).updateOne({ uuid: job.uuid, userUuid: job.userUuid }, { $set: job }, (err?: AnyError, res?: UpdateResult) => {
         if (err) throw err;
-        const dbo = db.db(DB);
-        dbo.collection(JOBS_COLLECTION).updateOne({ uuid: job.uuid }, { $set: job }, (err?: AnyError, res?: UpdateResult) => {
-            if (err) throw err;
-            db.close();
-            return `${JSON.stringify(job)} has been updated`;
-        });
+        db.close();
+        return `${JSON.stringify(job)} has been updated`;
     });
 };
+
+export const findJobsByGroupName = async (userUuid: string, groupName: string) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    const foundJobs = await dbo.collection(JOBS_COLLECTION).find({ userUuid, host: { $regex: groupName } }).toArray();
+    return foundJobs || null;
+}
+
+export const findGroupNames = async (userUuid: string) => {
+    const groupNames = new Array<string>();
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    const foundJobs: Job[] = await dbo.collection(JOBS_COLLECTION).find({ userUuid }).toArray();
+    foundJobs.forEach(job => {
+        const groupName = getWebpageName(job.host);
+        !groupNames.includes(groupName) && groupNames.push(groupName);
+    });
+    return groupNames;
+}
 
 export const findUserByEmail = async (email: string) => {
     const db = await MongoClient.connect(URL);
@@ -78,16 +91,13 @@ export const findUserByEmail = async (email: string) => {
     return foundUser;
 };
 
-export const insertToUsers = (user: User) => {
+export const insertToUsers = async (user: User) => {
     if (!user.uuid) throw 'User does not have an UUID assigned!';
-    return MongoClient.connect(URL, (err?: AnyError, db?: MongoClient) => {
+    const db = await MongoClient.connect(URL);
+    const dbo = db.db(DB);
+    await dbo.collection(USERS_COLLECTION).insertOne(user, (err?: AnyError, res?: InsertOneResult) => {
         if (err) throw err;
-        const dbo = db.db(DB);
-        dbo.collection(USERS_COLLECTION).insertOne(user, (err?: AnyError, res?: InsertOneResult) => {
-            if (err) throw err;
-            db.close();
-            return `${JSON.stringify(user)} has been inserted`;
-        });
+        db.close();
+        return `${JSON.stringify(user)} has been inserted`;
     });
-    return `${JSON.stringify(user)} has been inserted`;
 };

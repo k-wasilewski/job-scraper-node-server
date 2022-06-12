@@ -1,8 +1,8 @@
 import { PubSub } from "graphql-subscriptions";
 import {scrape} from './scraper';
-import {getDirectories, getFilenames, removeDir, removeFile} from "./utils";
+import {getDirectories, getFilenames, removeDir, removeFile, sameMembers} from "./utils";
 import {getUsersScreenshotsPath} from "./server";
-import {deleteJobByUuid, User} from "./mongodb";
+import {deleteJobByUuid, findGroupNames, findJobsByGroupName, Job, User} from "./mongodb";
 import {login, register, SPRING_SCRAPE_UUID} from "./auth";
 
 export const pubsub = new PubSub();
@@ -13,7 +13,11 @@ export default {
       if (!context.user) throw authError('Unauthorized');
       try {
         const dir = getUsersScreenshotsPath(context.user.uuid);
-        return { names: getDirectories(dir) };
+        const fsNames = getDirectories(dir);
+        const dbNames = await findGroupNames(context.user.uuid);
+        if (!sameMembers(fsNames, dbNames)) throw Error('Database and filesystem mismatch!');
+
+        return { names: fsNames };
       } catch (error) {
         throw error;
       }
@@ -24,7 +28,12 @@ export default {
       if (!context.user) throw authError('Unauthorized');
       try {
         const dir = getUsersScreenshotsPath(context.user.uuid);
-        return { files: getFilenames(`${dir}/${args.groupName}`) };
+        const fsNames = getFilenames(`${dir}/${args.groupName}`);
+        const dbJobs: Job[] = await findJobsByGroupName(context.user.uuid, args.groupName);
+        const dbNames = dbJobs.map(job => job.uuid);
+        if (!sameMembers(fsNames, dbNames)) throw Error('Database and filesystem mismatch!');
+
+        return { files:  fsNames};
       } catch (error) {
         throw error;
       }
@@ -64,7 +73,7 @@ export default {
       try {
         const dir = getUsersScreenshotsPath(context.user.uuid);
         const scrRemoved = removeFile(`${dir}/${args.groupName}/${args.uuid}.png`);
-        const jobRemoved = deleteJobByUuid(args.uuid);
+        const jobRemoved = await deleteJobByUuid(context.user.uuid, args.uuid);
         return { deleted: scrRemoved && jobRemoved };
       } catch (error) {
         throw error;
@@ -79,9 +88,9 @@ export default {
         const jobsOfGroup = getFilenames(`${dir}/${args.groupName}`);
         const jobsToRemove = jobsOfGroup.length;
         let jobsRemoved = 0;
-        jobsOfGroup.forEach(jobUuid => {
+        await jobsOfGroup.forEach(async jobUuid => {
           removeFile(`${dir}/${args.groupName}/${jobUuid}.png`);
-          deleteJobByUuid(jobUuid);
+          await deleteJobByUuid(context.user.uuid, jobUuid);
           jobsRemoved++;
         });
         const success = jobsToRemove === jobsRemoved;

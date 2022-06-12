@@ -20,7 +20,7 @@ export const register: (email: string, password: string) => Promise<AuthResponse
         const token = jwt.sign({ uuid, email }, JWT_SECRET, { expiresIn: '2h' });
         const user: User = { uuid, email, password: hashedPwd };
 
-        insertToUsers(user);
+        await insertToUsers(user);
 
         return { success: true, token, user };
     } catch (error) {

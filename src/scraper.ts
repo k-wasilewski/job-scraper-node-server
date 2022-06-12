@@ -48,22 +48,24 @@ export const scrape = async (
 
             const jobPage = await browser.newPage();
             const jobLink = job.includes('http') ? job : host + job;
+            await jobPage.setViewport({ width: 1280, height: 1024 });
+            await jobPage.goto(jobLink);
 
-            const mongodbRecord: Job = { host, path, link: jobLink };
-            const persistedJob = getJobByLink(mongodbRecord.link);
+            const mongodbRecord: Job = { host, path, link: jobLink, userUuid };
+            const persistedJob = await getJobByLink(mongodbRecord.userUuid, mongodbRecord.link);
             let uuid: string;
             if (persistedJob) {
                 uuid = persistedJob.uuid;
             } else {
                 uuid = generateUUID();
                 mongodbRecord.uuid = uuid;
-                insertToJobs(mongodbRecord);
+                await insertToJobs(mongodbRecord);
                 const payload = { newJobs: { timestamp: new Date().toString(), link: job.link } };
                 console.log(`Publishing message: ${JSON.stringify(payload)}`);
                 pubsub.publish('newJobs', payload);
             }
 
-            userUuid !== SPRING_SCRAPE_UUID && await jobPage.screenshot({path: './screenshots/' + userUuid + '/' + name + '/' + uuid + '.png', fullPage: true});
+            userUuid !== SPRING_SCRAPE_UUID && !persistedJob && await jobPage.screenshot({path: './screenshots/' + userUuid + '/' + name + '/' + uuid + '.png', fullPage: true});
         }
     }
 
