@@ -86,16 +86,12 @@ export default {
       try {
         const dir = getUsersScreenshotsPath(context.user.uuid);
         const jobsOfGroup = getFilenames(`${dir}/${args.groupName}`);
-        const jobsToRemove = jobsOfGroup.length;
-        let jobsRemoved = 0;
-        await jobsOfGroup.forEach(async jobUuid => {
+        jobsOfGroup.forEach(jobUuid => {
           removeFile(`${dir}/${args.groupName}/${jobUuid}.png`);
-          await deleteJobByUuid(context.user.uuid, jobUuid);
-          jobsRemoved++;
+          deleteJobByUuid(context.user.uuid, jobUuid);
         });
-        const success = jobsToRemove === jobsRemoved;
-        if (success) removeDir(`${dir}/${args.groupName}`);
-        return { deleted: success };
+        removeDir(`${dir}/${args.groupName}`);
+        return { deleted: true };
       } catch (error) {
         throw error;
       }
