@@ -1,0 +1,31 @@
+FROM arm32v7/node:14.7-alpine
+
+ENV CHROME_BIN="/usr/bin/chromium-browser" \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
+
+RUN set -x \
+    && apk update \
+    && apk upgrade \
+    && apk add --no-cache \
+    udev \
+    ttf-freefont \
+    chromium \
+    && npm install puppeteer@13.3.2
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN apk add --update python make g++ && rm -rf /var/cache/apk/*
+
+ENV NODE_OPTIONS="--max-old-space-size=256"
+
+ARG NEXT_CLIENT_HOST
+
+ENV NEXT_CLIENT_HOST=$NEXT_CLIENT_HOST
+
+RUN npm install
+
+COPY . .
+
+CMD [ "npm", "start" ]
