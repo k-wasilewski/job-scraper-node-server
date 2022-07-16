@@ -42,7 +42,11 @@ export default async (port: number): Promise<Server> => {
 
   const server: Server = createServer(app);
 
-  app.use(cors({ origin: process.env.NEXT_CLIENT_HOST ? process.env.NEXT_CLIENT_HOST : 'http://localhost:3000', credentials: true }));
+  const envClientHost = process.env.NEXT_CLIENT_HOST;
+
+  const clientHost = envClientHost ? `http://${envClientHost}` : "http://localhost:3000";
+
+  app.use(cors({ origin: clientHost, credentials: true }));
 
   app.use('/screenshots', express.static(SCREENSHOTS_PATH));
 
@@ -52,7 +56,7 @@ export default async (port: number): Promise<Server> => {
     playground: false,
     schema,
     context: async ({ req, res }: { req: RequestWithCookies, res: Response }) => {
-        res.setHeader('Access-Control-Allow-Origin', process.env.NEXT_CLIENT_HOST ? process.env.NEXT_CLIENT_HOST : 'http://localhost:3000');
+        res.setHeader('Access-Control-Allow-Origin', clientHost);
         if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
             !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/) &&
             req.headers['origin'] !== 'job-scraper-spring-server:8081') {
