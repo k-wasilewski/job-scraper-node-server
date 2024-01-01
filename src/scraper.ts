@@ -11,7 +11,7 @@ export const scrape = async (
     jobAnchorSelector: string,
     jobLinkContains: string,
     numberOfPages: number,
-    userUuid?: string
+    userUuid: string
 ) => {
     const browser = await puppeteer.launch({
         headless: true,
