@@ -13,6 +13,8 @@ export const scrape = async (
     numberOfPages: number,
     userUuid: string
 ) => {
+    if (userUuid === SPRING_SCRAPE_UUID) return;
+
     const browser = await puppeteer.launch({
         headless: true,
         executablePath: process.env.CHROME_BIN || null,
@@ -60,12 +62,13 @@ export const scrape = async (
                 uuid = generateUUID();
                 mongodbRecord.uuid = uuid;
                 await insertToJobs(mongodbRecord);
-                const payload = { newJobs: { timestamp: new Date().toString(), link: job.link } };
+
+                await jobPage.screenshot({path: './screenshots/' + userUuid + '/' + name + '/' + uuid + '.png', fullPage: true});
+
+                const payload = { newJobs: { timestamp: new Date().toString(), link: mongodbRecord.link } };
                 console.log(`Publishing message: ${JSON.stringify(payload)}`);
                 pubsub.publish('newJobs', payload);
             }
-
-            userUuid !== SPRING_SCRAPE_UUID && !persistedJob && await jobPage.screenshot({path: './screenshots/' + userUuid + '/' + name + '/' + uuid + '.png', fullPage: true});
         }
     }
 

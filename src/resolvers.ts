@@ -3,7 +3,7 @@ import {scrape} from './scraper';
 import {getDirectories, getFilenames, removeDir, removeFile, sameMembers} from "./utils";
 import {getUsersScreenshotsPath} from "./server";
 import {deleteJobByUuid, findGroupNames, findJobsByGroupName, Job, User} from "./mongodb";
-import {login, register} from "./auth";
+import {login, register, SPRING_SCRAPE_UUID} from "./auth";
 
 export const pubsub = new PubSub();
 
@@ -53,15 +53,17 @@ export default {
       path: string,
       jobAnchorSelector: string,
       jobLinkContains: string,
-      numberOfPages: number
+      numberOfPages: number,
+      userUuid?: string
       }, context: { user: User }) => {
       if (!context.user) throw authError('Unauthorized');
+      if (context.user.uuid === SPRING_SCRAPE_UUID && !args.userUuid) throw clientError('Missing userUuid');
    
       const _host = args.host.replace(/&quot/g, '"');
       const _path = args.path.replace(/&quot/g, '"');
       const _jobAnchorSelector = args.jobAnchorSelector.replace(/&quot/g, '"');
       const _jobLinkContains = args.jobLinkContains.replace(/&quot/g, '"');
-      return await scrape(_host, _path, _jobAnchorSelector, _jobLinkContains, args.numberOfPages, context.user.uuid)
+      return await scrape(_host, _path, _jobAnchorSelector, _jobLinkContains, args.numberOfPages, args.userUuid || context.user.uuid)
     },
     removeScreenshotByGroupAndUuid: async (_: any, args: {
       groupName: string,
