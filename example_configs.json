@@ -9,7 +9,7 @@
   {
     "host": "https://bulldogjob.pl",
     "path": "/companies/jobs/s/city,Remote,Warszawa/role,fullstack/skills,Java,JavaScript/page.{}",
-    "jobAnchorSelector": "a[class*=\"absolute top-0 left-0 w-full h-full\"]",
+    "jobAnchorSelector": "a[class*=\"shadow-jobitem\"]",
     "jobLinkContains": "jobs",
     "numberOfPages": 1
   },

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "zen start",
-    "build": "zen build"
+    "start": "SET NODE_OPTIONS=--openssl-legacy-provider && zen start",
+    "build": "SET NODE_OPTIONS=--openssl-legacy-provider && zen build"
   },
   "dependencies": {
     "@babel/cli": "^7.0.0",
