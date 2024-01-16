@@ -11,8 +11,9 @@ type JobGroupNames {
     names: [String]
 }
 
-type Filenames {
-    files: [String]
+type Screenshot {
+    name: String
+    link: String
 }
 
 type DeleteFileResp {
@@ -41,7 +42,7 @@ type AuthResponse {
 
 type Query {
     getGroupNames: JobGroupNames
-    getScreenshotsByGroup(groupName: String): Filenames
+    getScreenshotsByGroup(groupName: String): [Screenshot]
     verify: UserResponse
 }
 

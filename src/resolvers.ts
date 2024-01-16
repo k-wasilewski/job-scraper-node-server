@@ -1,6 +1,6 @@
 import { PubSub } from "graphql-subscriptions";
 import {scrape} from './scraper';
-import {getDirectories, getFilenames, removeDir, removeFile, sameMembers} from "./utils";
+import {getDirectories, getFilenames, getJobLinkByUuid, removeDir, removeFile, sameMembers} from "./utils";
 import {getUsersScreenshotsPath} from "./server";
 import {deleteJobByUuid, findGroupNames, findJobsByGroupName, Job, User} from "./mongodb";
 import {login, register, SPRING_SCRAPE_UUID} from "./auth";
@@ -32,8 +32,12 @@ export default {
         const dbJobs: Job[] = await findJobsByGroupName(context.user.uuid, args.groupName);
         const dbNames = dbJobs.map(job => job.uuid);
         if (!sameMembers(fsNames, dbNames)) throw Error('Database and filesystem mismatch!');
+        const screenshots = fsNames.map(name => {
+          const link = getJobLinkByUuid(name, dbJobs);
+          return { name, link };
+        });
 
-        return { files:  fsNames};
+        return screenshots;
       } catch (error) {
         throw error;
       }

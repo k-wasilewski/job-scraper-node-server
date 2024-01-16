@@ -6,7 +6,7 @@ import {getWebpageName} from "./utils";
 
 const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
-const URL = 'mongodb://sa:password@localhost:27017';
+const URL = 'mongodb://sa:password@mongodb:27017';
 const DB = 'scraping_db';
 const JOBS_COLLECTION = 'jobs';
 const USERS_COLLECTION = 'users';

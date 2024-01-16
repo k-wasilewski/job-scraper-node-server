@@ -1,4 +1,5 @@
 import fs from "fs";
+import { Job } from "./mongodb";
 
 export const generateUUID = () => {
     var dt = new Date().getTime();
@@ -50,4 +51,9 @@ export const sameMembers = (arr1: Array<Object>, arr2: Array<Object>) => {
     const set2 = new Set(arr2);
     return arr1.every(item => set2.has(item)) &&
         arr2.every(item => set1.has(item))
+}
+
+export const getJobLinkByUuid = (uuid: string, jobs: Job[]) => {
+    const job: Job = jobs.find(job => job.uuid === uuid);
+    return job ? job.link : null;
 }
