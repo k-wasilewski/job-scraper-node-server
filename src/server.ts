@@ -17,11 +17,15 @@ type ExpressGraphQLOptionsFunction = (req?: express.Request, res?: express.Respo
 
 function graphiqlExpress(options: GraphiQL.GraphiQLData | ExpressGraphQLOptionsFunction) {
   const graphiqlHandler = (req: express.Request, res: express.Response, next: any) => {
+    // @ts-ignore
     const query = req.url && url.parse(req.url, true).query;
     GraphiQL.resolveGraphiQLString(query, options, req).then(
       (graphiqlString: any) => {
+        // @ts-ignore
         res.setHeader('Content-Type', 'text/html');
+        // @ts-ignore
         res.write(graphiqlString);
+        // @ts-ignore
         res.end();
       },
       (error: any) => next(error)
@@ -56,6 +60,7 @@ export default async (port: number): Promise<Server> => {
     playground: false,
     schema,
     context: async ({ req, res }: { req: RequestWithCookies, res: Response }) => {
+      // @ts-ignore
         res.setHeader('Access-Control-Allow-Origin', clientHost);
         if (!(req.body as GraphqlBody).query.match(/mutation( )*{( )*register( )*\(/) &&
             !(req.body as GraphqlBody).query.match(/mutation( )*{( )*login( )*\(/) &&
