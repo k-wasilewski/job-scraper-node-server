@@ -65,9 +65,11 @@ const getTokenPayload = (token: string) => {
 
 export const getUserFromToken = async (token: string) => {
     if (token) {
-        const { uuid, email } = getTokenPayload(token);
+        const payload = getTokenPayload(token);
+        const uuid = payload?.uuid || null;
+        const email = payload?.email || null;
         const user = await findUserByEmail(email);
-        if (user.uuid !== uuid) throw new Error('Not authenticated');
+        if (user?.uuid !== uuid) throw new Error('Not authenticated');
         return user;
     }
 
