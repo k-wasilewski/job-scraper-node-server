@@ -22,6 +22,8 @@ RUN npm install
 
 COPY . .
 
+RUN npm test
+
 ENV NEXT_CLIENT_HOST="192.168.0.8"
 
 CMD [ "npm", "start" ]

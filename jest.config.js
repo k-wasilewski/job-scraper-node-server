@@ -3,8 +3,8 @@ module.exports = {
     "<rootDir>"
   ],
   "testMatch": [
-    '**/test/**',
-    '!**/src/**'
+    '<rootDir>/test/**',
+    '!<rootDir>/src/**'
   ],
   "preset": "ts-jest",
   "transform": {
