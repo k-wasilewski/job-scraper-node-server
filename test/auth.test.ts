@@ -1,7 +1,7 @@
 import * as mongodb from '../src/mongodb';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-import { SPRING_SCRAPE_UUID, getSpringScrapeUserFromToken, getUserFromToken, login } from '../src/auth';
+import { SPRING_SCRAPE_UUID, getSpringScrapeUserFromToken, getUserFromToken, login, register } from '../src/auth';
 
 const validExpiredToken: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDdiMmEzMjYtYzA5ZS00MTQxLWIyMTctZjdiYjY0MWY2MmIzIiwiZW1haWwiOiJhYmNAYWJjLnBsIiwiaWF0IjoxNzA2NTI4NzM4LCJleHAiOjE3MDY1MzU5Mzh9.WFun_los8MoWSV8V-GKX286Ozng4tNh2mevjvveJDwE";
 
@@ -26,7 +26,8 @@ const getMockUser: () => Promise<mongodb.User> = async () => {
 };
 
 jest.mock('../src/mongodb.ts', () => ({
-    findUserByEmail: jest.fn()
+    findUserByEmail: jest.fn(),
+    insertToUsers: jest.fn()
 }));
 
 jest.mock('jsonwebtoken', () => ({
@@ -117,7 +118,7 @@ describe('getUserFromToken spec', () => {
     });
 });
 
-describe('getUserFromToken spec', () => {
+describe('getSpringScrapeUserFromToken spec', () => {
     afterEach(() => {
         jest.resetAllMocks();
     });
@@ -233,7 +234,7 @@ describe('login spec', () => {
         expect(ret.error).toEqual({ message: 'Password does not meet requirements.' });
     });
 
-    it('loginshould return success=false if credentials are invalid', async () => {
+    it('should return success=false if credentials are invalid', async () => {
         (mongodb.findUserByEmail as jest.Mock).mockImplementation(() => Promise.resolve(undefined));
 
         const ret = await login('myemail@org.org', 'Mymockpwd123*');
@@ -241,5 +242,77 @@ describe('login spec', () => {
         expect(ret).toBeDefined();
         expect(ret.success).toBeFalsy();
         expect(ret.error).toEqual({ message: 'Invalid credentials.'});
+    });
+});
+
+describe('register spec', () => {
+    afterEach(() => {
+        jest.resetAllMocks();
+    });
+
+    it('should return success=true along with user and token and insert user to database if credentials are valid', async () => {
+        const actualJwt = jest.requireActual('jsonwebtoken');
+        const mockUser = await getMockUser();
+        (mongodb.insertToUsers as jest.Mock).mockImplementation(() => Promise.resolve(mockUser));
+
+        const ret = await register(mockUser.email, mockUserPassword);
+        const tokenPayload = actualJwt.verify(ret.token, 'UYGgyugf896tGhgOGkjh76G');
+
+        expect(ret).toBeDefined();
+        expect(ret.success).toBeTruthy();
+        expect(ret.user!.email).toEqual(mockUser.email);
+        expect(await bcrypt.compare(mockUserPassword, ret.user!.password)).toBeTruthy();
+        expect(ret.user!.uuid!.length).toEqual(36);
+        expect(ret.user!.uuid!.match(/\w{8}-\w{4}-4\w{3}-\w{4}-\w{12}/)).toBeTruthy();
+        expect(tokenPayload).toEqual(expect.objectContaining({ uuid: ret.user!.uuid, email: ret.user!.email }));
+    });
+
+    it('valid token\'s expiration date should be 2 hours from now', async () => {
+        const actualJwt = jest.requireActual('jsonwebtoken');
+        const mockUser = await getMockUser();
+        (mongodb.insertToUsers as jest.Mock).mockImplementation(() => Promise.resolve(mockUser));
+
+        const ret = await register(mockUser.email, mockUserPassword);
+        const tokenPayload = actualJwt.verify(ret.token, 'UYGgyugf896tGhgOGkjh76G');
+
+        const expDate = new Date(parseInt(tokenPayload.exp) * 1000);
+        const diff = expDate.getTime() - new Date().getTime();
+        const hrDiff = diff / 3600 / 1000;
+        const expiresInHours = parseFloat((hrDiff).toFixed(2));
+        
+        expect(expiresInHours).toEqual(2);
+    });
+
+    it('should return error message if email not present', async () => {
+        const ret = await register('', 'mypassword');
+
+        expect(ret).toBeDefined();
+        expect(ret.success).toBeFalsy();
+        expect(ret.error).toEqual({ message: 'Both email and password are required.' });
+    });
+
+    it('should return error message if password not present', async () => {
+        const ret = await register('myemail', '');
+
+        expect(ret).toBeDefined();
+        expect(ret.success).toBeFalsy();
+        expect(ret.error).toEqual({ message: 'Both email and password are required.' });
+    });
+
+    it('should return error message if email is not valid', async () => {
+        const ret = await register('myemail', 'Myvalidpwd123*');
+
+        expect(ret).toBeDefined();
+        expect(ret.success).toBeFalsy();
+        expect(ret.error).toEqual({ message: 'Email does not meet requirements.' });
+    });
+
+    it.each([['Pass12*'], ['PASSWD12*'], ['passwd12*'], ['Passwddd*'], ['Passwd123']])
+    ('should return error message if password is not valid: %p', async (pwd) => {
+        const ret = await register('myemail@something.org', pwd);
+
+        expect(ret).toBeDefined();
+        expect(ret.success).toBeFalsy();
+        expect(ret.error).toEqual({ message: 'Password does not meet requirements.' });
     });
 });
