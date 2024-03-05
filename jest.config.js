@@ -8,6 +8,7 @@ module.exports = {
   ],
   "preset": "ts-jest",
   "transform": {
+    "\\.(gql|graphql)$": "@graphql-tools/jest-transform",
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
 };

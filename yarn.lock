@@ -1234,6 +1234,37 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@graphql-tools/jest-transform@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/@graphql-tools/jest-transform/-/jest-transform-2.0.0.tgz"
+  integrity sha512-7dVVs7f9qlJp2l3CSpy+B1sbaWprNNy72/KTC6fp4k1lNtXYPP9g76D7HpNbgwvdUBRZfiPlOiztnwTcKCzUdA==
+  dependencies:
+    "@graphql-tools/webpack-loader" "7.0.0"
+    "@jest/transform" "^29.0.0"
+    "@jest/types" "^29.0.0"
+    tslib "^2.4.0"
+
+"@graphql-tools/optimize@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/@graphql-tools/optimize/-/optimize-2.0.0.tgz"
+  integrity sha512-nhdT+CRGDZ+bk68ic+Jw1OZ99YCDIKYA5AlVAnBHJvMawSx9YQqQAIj4refNc1/LRieGiuWvhbG3jvPVYho0Dg==
+  dependencies:
+    tslib "^2.4.0"
+
+"@graphql-tools/webpack-loader-runtime@7.0.0":
+  version "7.0.0"
+  resolved "https://registry.npmjs.org/@graphql-tools/webpack-loader-runtime/-/webpack-loader-runtime-7.0.0.tgz"
+  integrity sha512-E5Flr2NbuTH+sfiMY2HacLbczJEDmqfKC0haOsc24wN0hV3rJvvPiqYIROgILgwVSJPQIQ4cOf/XcRsatrGDvQ==
+
+"@graphql-tools/webpack-loader@7.0.0":
+  version "7.0.0"
+  resolved "https://registry.npmjs.org/@graphql-tools/webpack-loader/-/webpack-loader-7.0.0.tgz"
+  integrity sha512-Mf2ZkoVR5+J5pFu5P0LPjvHZCObIs61IuQR8sFanMQXQDaM/f2dMn1Ie8pQ42YfDgLDbvJ+4XIikicJH1oDIDw==
+  dependencies:
+    "@graphql-tools/optimize" "2.0.0"
+    "@graphql-tools/webpack-loader-runtime" "7.0.0"
+    tslib "^2.4.0"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz"
@@ -1409,7 +1440,7 @@
     jest-haste-map "^29.7.0"
     slash "^3.0.0"
 
-"@jest/transform@^29.7.0":
+"@jest/transform@^29.0.0", "@jest/transform@^29.7.0":
   version "29.7.0"
   resolved "https://registry.npmjs.org/@jest/transform/-/transform-29.7.0.tgz"
   integrity sha512-ok/BTPFzFKVMwO5eOHRrvnBVHdRy9IrsrW1GpMaQ9MCnilNLXQKmAX8s1YXDFaai9xJpac2ySzV0YeRRECr2Vw==
@@ -1430,7 +1461,7 @@
     slash "^3.0.0"
     write-file-atomic "^4.0.2"
 
-"@jest/types@^29.6.3":
+"@jest/types@^29.0.0", "@jest/types@^29.6.3":
   version "29.6.3"
   resolved "https://registry.npmjs.org/@jest/types/-/types-29.6.3.tgz"
   integrity sha512-u3UPsIilWKOM3F9CXtrG8LEJmNxwoCQC/XVj4IKYXvvpx7QIi/Kg1LI5uDmDpKlac62NUtX7eLjRh+jVZcLOzw==
@@ -9195,6 +9226,11 @@ tslib@^1.9.3:
   version "1.14.1"
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
+tslib@^2.4.0:
+  version "2.6.2"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-2.6.2.tgz"
+  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
 tslint-config-prettier@1.18.0:
   version "1.18.0"

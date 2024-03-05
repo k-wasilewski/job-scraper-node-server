@@ -87,6 +87,7 @@
     "zen": "^0.1.7"
   },
   "devDependencies": {
+    "@graphql-tools/jest-transform": "^2.0.0",
     "@types/jest": "^29.5.11",
     "ts-jest": "^29.1.2"
   }
